@@ -1,0 +1,29 @@
+Luego de programar los algoritmos en matlab se procedió,
+a ejecutarlos para ver los resultados, y notar si se existía un
+valor parecido en ambas situaciones.
+
+\begin{tabular}{llcll}
+	\textbf{Newton:} & $y_{n+1} = {-0.8159 \brack -0.3694}$ & &\textbf{Lipschitz:} & $y_{n+1} = {-0.8133 \brack -0.3703}$ \\
+\end{tabular}
+
+Con respecto al tiempo que se empleo en realizar el cálculo
+de cada algoritmo, nos dimos cuenta que no siempre era el mismo,
+esto tiene completa relacion porque no realizamos los cálculos
+en una máquina \emph{Real Time}, por lo tanto lo que decidimos
+fue poder realizar 10 ejecuciones y promediar un valor,
+para poder obtener un valor cercano al real.
+
+A continuación se muestra una tabla con los tiempos (en segundos) 
+que resultaron de las 10 ejecuciones de nuestros algoritmos.
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+	\hline
+	Método & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  \\\hline 
+	Lipschitz (s) & 25.15 & 21.46 & 21.03 & 23.00 & 23.63 & 23.59 & 22.69 & 21.83 & 25.18 & 24.04  \\\hline
+	Newton (s)    & 23.85 & 23.66 & 23.23 & 21.50 & 21.45 & 22.47 & 23.25 & 22.36 & 24.33 & 21.83  \\\hline
+\end{tabular}
+\end{center}
+Finalmente tenemos el promedio:
+\begin{tabular}{llcll}
+	\textbf{Newton:} & 22.793 segundos & &\textbf{Lipschitz:} & 23.160 segundos \\
+\end{tabular}

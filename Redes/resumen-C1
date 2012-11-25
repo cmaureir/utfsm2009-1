@@ -1,0 +1,1144 @@
+
+ 1- Introducción
+	* Que es una Red de Computadores: Es un conjunto de nodos (grafo) que se comunican entre si? intercambio de "Informacion".
+	* Requerimientos de una Red (3 Actores, Usuario, Diseñador y Proveedor): conectividad y escalabilidad.
+	* Conectividad
+		- Varios Niveles: nodo o host y a nivel de link (punto a punto o de acceso múltiple(Presentan limitaciones de escalabilidad))
+	* Redes de conexion indirecta: La conexion se produce en las llamadas Redes de Packet Switching
+		Switched Network
+			Circuit Switched
+			Packet Switched
+				- Utilizan tecnica de Store & forward
+				- Cada switch o nodo interno de la RED, almacena los paquetees y porteriormente los transmite.
+				- La funcion del switch es almacenar paquetes y despacharlos.
+		Las unidades de informacion que se trasmiten por estas redes se denominan paquetes o mensajes.
+		El concepto de switch aca no se refiere a los "Switch's ethernet". Se le denomina a un elemento generico que permite traspasar paquetes de un lado a otro.
+
+ 2- Conceptos básicos:
+	* Escalabilidad de las redes:
+		- Cuellos de botella: Puntos de conexión entre las redes (switches, routers, etc.)
+		- Backbone: Interconectan nubes de redes. (bien complejos)
+
+	* Servicios Básicos que deben ofrecer las redes:
+		- Unicast: 	origen -> destino
+		- Broadcast:	origen -> Todos los destinos (misma red)	= en lan gratuito, en nubes MUY caro
+		- Multicast:	origen -> Grupo específico 			= conferencias de red, etc.
+		- Anycast:	origen -> un solo receptor dentro de un grupo	= natural en IPv6 y posible en IPv4
+	
+	* Clasificación de Redes;
+		- Directa: Los paquetes se transfieren directamente al destino (en la misma red)
+		- Indirecta: Paso a través de switches u otros intermediarios, interconección de redes.
+
+	* Definiciones Clásicas de Redes:
+		- WAN : Wide Area Network	= 10^2km
+		- MAN : Metropolitan A. N.	= campus Universidad
+		- LAN : Local A. N.		= 1km
+		- SAN : System A. N.		= clusters
+		- DAN : Desktop A. N.		= bus del pc es una red LAN
+		- PAN : Personal A. N.		= Bluetooth, muy corto alcanze
+
+	* Economias de Escalas:
+		- Agregación y desagregación: Multiplexión y demultiplexión
+	
+		* Multiplexión:
+			1- tdm: Time División Multiplexing	= Round Robin
+			2- fdm: Frecuency D. M.			= Moduladores en cada conexión, no es posible en redes de PC.
+			3- stdm: Statistical tdm		= Encola los paquetes y un controlador especial los despacha. Puede haber pérdida de paquetes.
+
+	
+
+ 	* Canales Abstractos
+		- Se refiere al concepto de la creación de un canal o ``tubo'' entre una aplicación de un host a otra aplicación de otro host.
+		- Para la aplicación todo esto es una caja negra.
+		- Protocolos:
+			1- Request/Reply	= No perdida de paquetes, soporta latencias altas, TCP, aplicaciones: ftp, http.
+			2- Message Stream	= si perdida de paquetes, no soporta latencias altas, UDP, aplicaciones: network video.
+					- Corresponde a tráfico HDX (halfduplex) o FDX (fullduplex) con retardos controlados.
+					-  Se debe garantizar el orden de los mensajes.
+
+	* Tipos de Tráfico:
+			SDX -> tráfico de 1 sola vía
+			HDX -> tráfico de 1 sola vía, ambos sentidos. En redes LAN puede darse (depende del chipset).
+			FDX -> Dos vias... (INVESTIGAR MAS)
+
+		~ Todos los elementos de la red deben cooperar para ofrecer QoS (Quality of Service).
+		~ El protocolo IP no asegura QoS.
+
+ 3- Arquitectura de Redes
+	- Documentos que guían el diseño de redes.
+
+	* Capas
+		- Programas de Aplicación
+		- Conexión Proceso a Proceso: Request/Reply Channel | Message Stream Channel
+		- Conexión Host a Host: Canales Abstractos que permiten comunicar aplicaciones.
+		- HW: Enlace de Datos, firmware.
+
+	* Protocolos
+		- Los objetos abstractos a través de los cuales se construyen los distintos niveles se denominan protocolos.
+		- Proveen el servicio de comunicación para los niveles superiores.
+		- Insertos en el SO.
+
+		* Interfaces:
+			- Service Interface: Define las operaciones que los objetos locales pueden realizar.
+			- Peer Interface: Define la forma y el sentido de los mensajes que se intercambian entre las máquinas.
+
+		* Tipos:
+			RRP: Request Reply Protocol (dirección de la aplicación, puerto).
+				- Capa superior a HHP: Si un programa utiliza ambos, se define el stack RRP/HHP
+			HHP: Host to Host Protocol (dirección del server).
+			DLP: Data Link Protocol (depende del tipo de red por la cual viaje).
+
+		* Encapsulación
+			- Los protocolos se van apilando como una pila (stacks), según su jerarquía, y forman los paquetes enviados.
+
+		* Estándares de Arquitecturas:
+			- ISO (International Standars Organization)
+				- Arquitectura OSI (Open System Interconection): Es un referente de arquitectura.
+			
+				1- Capa Física: Transmitir bits sin estructura sobre un enlace de comunicaciones
+					- Resuelve: Tamaño y forma de conectores, convertir bits en señales eléctricas.
+
+				2- Enlace de Datos: Transmitir pedazos de información a través de un enlace.
+					- Resuelve: Detección de corrupción de datos y coordinación de uso de medios físicos compartidos.
+
+				3- Capa de Red: Permitir que cualquier par de Host en la red se puedan comunicar entre sí.
+					- Resuelve: Cálculo de ruta, fragmentación y reemsamblado de paquetes.
+
+				4- Capa de Transporte: Establece canal Abstracto proceso a proceso.
+					- Resuelve: perdida de paquetes, paquetes duplicados, reordenamiento de paquetes.
+
+				5- Capa de Sesión: Ofrecer servicios sobre un flujo full-duplex confiable proporcionando por el nivel de transporte.
+					- Resuelve: Manejo de potencialmente diferentes flujos de transporte que son parte de una misma aplicación.
+
+				6- Capa de Presentación y Aplicación: Se encarga de las diferentes arquitecturas de los diferentes hosts.
+					- Resuelve: Presentación (representación de los datos, XDR, número de bits) y aplicación (FTAM, VT virtual terminal services)
+			
+ 4- Arquitectura de Internet
+	- También llamada arquitectura TCP/IP. Hijo de la Arpanet.
+	- Las aplicaciones son libres para utilizar los protocolos que quieran. Si quieren pueden usar IP saltandose TCP, etc.
+
+	.__________.
+	|Aplicacion|
+	|____      |
+	|TCP_|__   | Data link, Capa de transporet
+	|IP ____|__| Host a Host,
+	|Network   |
+	'----------'
+
+	~ El protocolo IP es central.
+
+	Filosofía central: Cualquiera puede proponer un protocolo, pero se debe entregar:
+		- Su especificación
+		- Una o más implantaciones representativas.
+
+	- Mantenidos por la IETF (Internet Engineering Task Force)
+	- La documentación es un conjunto de propuestas llamadas RFC (www.rfc-editor.org) que se comenzaron a publicar desde 1969.
+	- TAREA: Leer el rfc de IP.
+
+8- Sockets
+		La mayoría de los sistemas operativos implementan los protocolos de red como parte del núcleo, es decir, la interfaz que exporta la red es la llamada API (Application Programming Interface).
+		Si bien cada s.o. es libre para definir sus propias API de red, con el tiempo algunas han sido ampliamente soportadas, como es el caso de los sockets de UNIX.
+		Con esto, se logra portar aplicaciones entre distintos sistemas operativos.
+
+		
+		~ Los sockets se han estandarizado para todos los sistemas operativos (su origen viende de BSD). 
+		Cada protocolo provee un conjunto de servicios. La API proveee la sintaxis a través de la cual es posible obtenerlos.
+		La principal abstracción de la interfaz socket se llama socket!. Un socket es la conexión entre una aplicación y la red.
+
+		¿Cómo construir una aplicación de red?
+			int socket(int domain, int type, int protocol)
+
+				-domain: especifica la familia de protocolo. PF_INET para internet y PF_UNIX para pipes UNIX.
+				-type: semántica de la comunicación. SOCK_STREAM para flujo de bytes y SOCK_DGRAM para servicio orientado a mensajes.
+				-protocol: se especifica el protocolo. Normalmente es UNSPEC porque la combinación PF_INET y SOCK_STREAM implica TCP.
+
+			El socket retorna un identificador llamado handle que permite referenciarlo en el futuro.
+				El lado servidor hace un open pasivo, es decir, se prepara para recibir conecciones. Esto lo hace invocando tres operaciones.
+			
+				1- int bind(int socket, struct sockaddr *address, int addr_len)
+					- bind liga el socket recién creado con la dirección del servidor.
+					- Si es un protocolo Internet, la dirección es la IP y el número de puerto.
+
+				2- int listen(int socket, int backlog)
+					- Permite definir cuantas conecciones pueden quedar pendientes en un socket específico.
+
+				3- int accept(int socket, struct sockaddr *address, int addr_len)
+					- Activa el open pasivo y bloquea la conexión en espera del cliente.
+					- Cuando se completa la conexión, devuelve un nuevo socket que corresponde a la conexión recién establecida.
+
+				4- int connect(int socket, struct sockaddr *address, int addr_len)
+					- La funcion no retorna hasta que TCP ha establecido exitosamente una conexión.
+					- Una vez establecida la conexión, la aplicación puede comenzar el envío de datos.
+					- Es como hacer bind y listen al mismo tiempo.
+
+
+------------------------------------------- FIN Capítulo 1 -----------------------------------------
+
+2- Fundamento de las Comunicaciones
+
+ 1 y 2 - Introducción, Ancho de banda y Latencia
+
+	~ En el mundo de las redes todo se diseña para lograr tiempos cortos.
+	Conceptos relevantes de desempeño:
+		- Ancho de banda (BW):	- Número de bits que se transmiten en un período de tiempo.
+					- Sirve como medida de productividad.
+					- Es diferente el BW entre un links de comunicación, ya que está influenciado por otros factores (...)
+
+		- Latencia: 	propagación + transmisión + cola
+
+		- Tiempo de propagación: 	- Cuanto tiempo demora un bit en propagarse desde un extremo a otro?
+						- El tiempo de propagación también se denomina "tiempo de vuelo".
+						- Se mide solamente de ida.
+						= Distancia / k * c 		( m / m/s 	= segundos)
+
+		- Tiempo de Transmisión:	= Tamaño_del_mensaje / BW		(Bits / Bits/s 	= segundos)
+
+		- RTT: Round Trip Time:		- Tiempo de ida y vuelta de un bit.
+						- Es el conocido PING.
+
+		- Bits de tránsito: 		- Número de bits en tránsito (viajando) en una red.
+						= Tiempo de propagación x BW
+
+			c = Velocidad de la Luz en el vacío.
+			k = Factor que depende del medio.
+				 - En el vacio k=1
+
+
+			Velocidades de transmisión de datos:
+					Cobre: 			2.3x10^8 m/s
+					Fibra optica: 		2x10^8 m/s
+					Radio Frecuencia:	3x10^8 m/s
+
+ 3- Transmisión Análoga y Digital:
+
+	- Sólo determinadas por la forma de procesar la información
+		- Análoga:	Todos los niveles aportan información, señales continuas.
+		- Digital:	Sólo los niveles discretos aportan información.
+
+		- No pueden existir señales discretas!
+
+	- Porque hay tantas tecnologias digitales?
+		~ Las transformaciones permiten eliminar el 'ruido' existente en lo analógico.
+		~ Las cosas digitales son mas económicas de masificar.
+
+
+	* Ancho de banda Analógico
+		Tradicionalmente el ancho de banda analógico es una medida del ancho de una banda de frecuencia
+		Se denomina Ancho de Banda (BW) a la frecuencia a la cual la amplitud de la señal cae a 1/RAIZ(2) de su valor.
+			Esta determinado por la cantidad de Ciclos por segundo.
+		
+		~ Todo medio físico siempre tiene un ancho de banda limitado, y esto significa que las señales digitales sufren 
+		  una severa distorsión al pasar por medios físicos con ancho de banda reducidos.
+		~ Se denomina transmisión en Banda Base a la transmisión de señal digital sobre medios analógicos.
+
+	* Velocidad de Transmisión
+
+		* Teorema de Nyquist
+			Relaciona el Ancho de Banda Digital (bps) y Ancho de Banda Analógico (Hz).
+			Si el medio físico tiene un ancho de banda de BW, y la señal digital se codifica en N niveles discretos, Nyquist establece que:
+
+			Velocidad máxima = 2.BW log_2 N[bps]
+		
+			- Esta ecuación no considera el efecto del ruido.
+
+		* Teorema de Shannon
+			Establece una cota máxima para la capacidad de un canal en bps, en función de la relación Señal a Ruido.
+
+			Velocidad máxima = BW log_2 (1+S/N) [bps]
+
+			S/N se denomína relación Señal a RUido y representa el cuociente entra la potencia del ruido y la potencia de la señal.
+
+
+ 4- Códigos de Nivel uno (Transmisión en Banda Base)
+		Las señales viajan entre componentes de señalización. Los bits fluyen entre adaptadores.
+		El compontente de señalización de un adaptador de Red permite transformar señales en secuencias de bits.
+
+	Nodo -- Adaptador -- Componentes de señalización --> Señales <-- Componentes de señalización -- Adaptador -- Nodo
+
+	~ Cuando una señal pasa por un canal de ancho de banda limitado, la señal sufre una distorción.
+	~ Cuando pasa una señal sinusoidal (frecuéncia armónica), no se pierde la información!, lo que se pierde es la potencia de la señal.
+
+	Cuando el BW tiene una frecuencia menor a f_0 (~20KHz, se les llaman canales de voz (hechos para transmitir voz). Como estos canales no tienen perdida de información para las señales sinusoidales, se usa un modulador para transformar la señal electrónica (y despues la amplifican con un amplificador).
+
+	
+	* Codigo NRZ (Non Return to Zero)
+		~ Generado naturalmente por los flip-flops.
+		~ Mapeo mas directo o facil para la transformacion de la señal. Los 1 son cuando la señal esta alta y los 0 cuando esta baja.
+		El problema de NRZ se produce con secuencias largas de unos o ceros.
+			- El receptor necesita sincronizarse.
+			- Se necesita detectar presencia o ausencia de señal.
+		~ Los bits se almacenan en flip-flops (de tipo D) que forman un Shift Register (Registro de corrimiento).
+		~ Por lo tanto, para almancenar la información se necesita un Clock Pulse.
+			~ No basta con enviar sólo la señal sino que también se necesita el clock pulse para sincronizarla con el clock pulse de los registros del computador.
+			~ Ahora, si utilizaramos un cable de cobre para cada señal, nos quedarían 4 cables de cobre para conectar dos computadores (FDX, HDX, SDX, CP)
+				~ La electrónica logro señal que incluye el clock pulse. Este es decodificado por el Phase Locked Loop.
+				~ Pero, para una señal de puros 0s o 1s no se puede calcular el CP.
+	* Manchester
+		~ El codigo Manchester es un XOR entre el codigo NRZ y el clock.
+			~ Ethernet transmite en Banda Base en codificado Manchester
+			La dificultad que presenta la codificación manchester es que se dobla la razón a la cual se hacen las transciciones en un enlace (baud rate).
+			Como el bit rate es la mitad del baud rate, la eficiencia del código es del 50%.
+				~ Baudios = Transiciones de señal por segundo.
+
+	* NRZI (NRZ Invertido)
+		~ La señal solamente cambia cuando hay 1nos en NRZ
+
+	* Solución informática: Código 4B/5B
+		Esta  codificación busca resolver la ineficiencia de la codificacion Manchester sin mantener secuencias largas de unos o ceros.
+		Despues el código 5b se pasa a NRZI para evitar que se formen muchos 1nos seguidos.
+		Aplica la siguiente tabla de transformación:
+			
+			Entrada 4b	Código 5b
+			0000		11110
+			0001		01001
+			0010		10100
+			0011		10101
+			0100		01010
+			0101		01011
+			0110		01110
+			0111		01111
+			1000		10010
+			1001		10011
+			1010		10110
+			1011		10111
+			1100		11010
+			1101		11010
+			1110		11100
+			1111		11101
+
+
+ 5- bloques de hardware para configurar redes
+	las redes se construyen utilizando dos clases de bloques constructivos:
+		- nodos
+			-Correr aplicaciones
+			-Switches de mensajes
+			-Router para paquetes de internet
+		-links
+			- Los links pueden ser HDX (Half Duplex) o FDX (Full Duplex). En general se asume FDX
+			- Un Modem (Modulator/ Demodulator) es un dispositivo que codifica datos binarios en señales análogas aptas para ser transmitidas en medios análogos y en el otro extremo vuelve a convertir.
+	
+	* Links Locales
+		Tecnologías existentes:
+			Cable			BW		Distancia
+			---------------------	---------	--------
+			Cat 6			1 Gbps		90 m
+			Cat 5			100 Mbps	200 m
+			Coax 50 ohm		100 Mbps	500 m
+			Fibra Multimodo		100 Mbps	2 Km
+			Fibra Modo Simple	2.4 Gbps	40 Km	
+
+
+	* Links para grandes distancias
+		- Son equipos de comunicaciones complejos.
+		- Para mayores distancias mayores, es necesario utilizar empresas de carriers. 
+		- Los servicios que proporcionan estas empresas son:
+		
+			Servicio	BW
+			lsdn		64 kbps
+			DS1 (T1)	1.544 Mbps
+			DS3 (T3)	44.736 Mbps
+			STS1		51.840 Mbps
+			STS3		155.250 Mbps
+			STS12		622.080 Mbps
+			STS24		1244.160 Mbps
+			STS48		2488.320 Mbps
+	
+			STS: Synchronous Transport Signal, tambien se denomina OC: Optical Carrier
+			STS-N es N veces el Ancho de Banda del STS-1
+
+	* El problema de la \'ultima milla:
+		Los ISP deben llegar a muchas casas. El tendido para conectarlas es muy caro.
+		Esto se busca evitar aprovechando la infraestructura que esté ya instalada:
+			XDSL	    (aprovechar el cableado telefónico)
+			Power Lines (aprovechar el cableado eléctrico)
+			WIMAX	    (Gran radio de alcanze, 30~40KM)
+
+	* El cableado estructurado.
+		Es el sistema colectivo de cables, canalizaciones, conectores, etiquetas, espacios y demás dispositivos que deben ser instalados para establecer una infraestructura de telecomunicaciones genérica en un edificio o campus.
+
+
+------------------------------------------- FIN Capítulo 2 -----------------------------------------
+
+3- Trasnmisión de Frames
+
+ 1- Introducción:
+	Hasta ahora hemos estudiado el problema de transmitir bits sobre un link de comunicación
+	Estudiaremos la transmisión de frames
+	Por qué tenemos que envasar los bits en paquetes? (frames)
+		- Manejo y control de errores
+		- Multiplexión de líneas
+	Un aspecto importante es delimitar dónde comienza y termina un frame.
+	~ La multiplexión es la agregación de de muchas lineas diferentes. Se comparte la linea entre varias conexiones distintas.
+
+	* Adaptadores de Red
+		Es el adaptador de red el que permite a los nodos intercambiar frames.
+		El adaptador de red debe determinar donde comienza y donde terimna el frame.
+		Se usan frames en enlaces punto a punto y en redes de acceso múltiple como CSMA/CD y Token Ring.
+
+ 2- Protocolos Orientados al Byte
+		En la antiguedad se usaron estos protocolos para conectar terminales a mainframes.
+			- BISYNC (IBM 1960)
+			- IMP-IMP (ARPANET, RFC 41)
+			- DDCMP (Digital Data Communication Message Protocol) DEC
+		~ Eran multiplos de bites, de caracteres.
+
+		* Ejemplo Protocolo Bisync
+
+			8b	8b	8b		8b		8b	16b
+			Syn	Syn	SOH	Header	STX	Datos	ETX	CRC
+
+			BISYNC utiliza centinela para delimitar comienzo y fin: <STX>Datos</ETX>
+			STX y ETX son caracteres centinelas
+			SYN es un aracter de sincronización
+
+	* Técnica ``Character Stuffing''
+		Qué pasa si en los datos aparece el byte que corresponde a ETX?
+		La técnica para resoler esta situación se llama ``escaping'' o tambien ``character stuffing''
+	
+				<STX>	...	 DLE	ETX	...	</ETX>
+			Cada vez el adaptador en la transmisión encuentra en los datos un ETX, introduce antes un DLE.
+		El adaptador del receptor se encarga de eliminarlo.
+
+	* Delimitación de Frames con cuentas de Bytes.
+		Ejemplo: Como se cuando es el fin de archivo?
+			~ EOF (Centinela)
+			~ Indicar al comienzo la cantidad de bytes que tiene el archivo
+
+		Ejemplo: Protocolo DECNET
+			El problema es que por algún error de transmisión se pueda corromper Count. (lo mismo podría ocurrir con una corrupción de ETX)
+	 	
+	TAREA: Cual ocupa ethernet?
+
+ 3- Protocolos Orientados al BIT (HDLC)
+
+		Un frame es sólo una colección de bits
+		Historia
+			- SDLC: IBM (Synchronous Data Link Control)
+			- HDLC: OSI
+			- PPP: Point to Point Protocol (Muy similar a HDLC)
+
+		* HDLC:
+			comienzo			termino
+			01111110	Header	Datos	01111110
+
+		Como en los Datos se puede presentar la secuencia 01111110, se utiliza la técnica ``bit stuffing''. Cada 5 unos seguidos, se introduce un cero.
+		El adaptador al armar el frame es cuando introduce los ceros.
+		~ El costo lo sufre el BW.
+
+
+ 4- Detección de Errores
+
+	* Clases de errores:
+		* Ráfaga: 	Son muy raros en las redes modernas:
+					- Cobre: 1 bit errado en 10^7 bits.
+					- Fibra Optica: 1 bit errado en 10^14 bits.
+
+		* Paquetes: 	Un paquete se pierde totalmente por un error en algún bit o por un error en un switch.
+			  		- También pueden ocurrir cuando no hay suficiente memoria.
+
+		* Link:		El link se corta o el computador se cae.
+
+
+	* Tecnicas de corrección de errores:
+
+		* Paridad en 2 Dimensiones
+		* Checksum
+		* CRC
+
+
+	* Propiedades de los Códigos
+		Un código está formado por un conjunto de palabras. Por ejemplo, alguna palabras del código ASCII son:
+
+			'a': 1100001
+			'h': 1001000
+			'o': 1101111
+
+		Distancia entre dos palabras es el número de bits que difieren. La 'a' y la 'o' tienen distancia 3.
+
+		* Distancia Mínima del código
+			- Es la mínima distancia entre dos palabras cualquiera.
+			- Sea d la distancia mínima del código:
+
+				d=1: no tiene ninguna propiedad
+				d=2: puede detectar un error
+				d=3: puede corregir un error o detectar 2 errores.
+
+		* Bits de paridad:
+			- Una forma simple de aumentar la distancia Mínima (agregando un bit de paridad par o impar al final de las palabras). 
+
+			* Paridad en 1 dimension.
+				- En 1 dimensión no sirve mucho, ya que si se contaminan muchos bits, solo existen un %50 de ser detectados.
+
+			* Paridad en 2 dimensiones.
+				- Se pueden controlar mejor los errores de ráfaga.
+			
+
+	* Código Hamming: Algoritmo muy sencillo que permite generar distancia 3.
+
+		Ej: N de símbolos válidos es 16 -> N de bits = 4
+		Ej: Codificar 1101 en hamming
+
+			1- Enumeramos como cualquer mortal
+			2- Marcamos todos los que son potencias de 2.
+
+			1	2	3	4	5	6	7	8	9
+			x	x		x				
+
+			3- Colocamos el mensaje  en los casilleros libres:
+
+			1	2	3	4	5	6	7	8	9
+			x	x	1	x	1	0	1	
+
+			4- Cada uno de estos bits marcados va a darle paridad a un bit del mensaje:
+
+			
+			1	2	3	4	5	6	7	
+			p1	p2	1	p3	1	0	1	
+
+
+			p3	p2	p1	bit
+			0	0	0	0		p1 = {1,3,5,7}
+			0	0	1	1		p2={2,3,6,7}
+			0	1	0	2		p3={4,5,6,7}
+			0	1	1	3
+			1	0	0	4	
+			1	0	1	5
+			1	1	0	6
+			1	1	1	7
+
+
+			Ej: Que pasa si se pierde el bit 5?
+
+				1	2	3	4	5	6	7
+				1	0	1	0	X	0	1
+
+				Se hace un XOR entre los bits de paridad y sus bits de cada uno:
+
+				p1= 1
+				p2= 0			---> 101 = 5 --> ahi se encuentra un error.
+				p3= 1			
+		
+
+	* Códigos de redundancia Cíclicia (CRC)
+
+		El código CRC es usado en todas las LAN
+		Los bits de un frame se representan como coegficientes de un polinomio
+		Ejemplo: Si el frame es 111001, os coeficientes son: 1,1,1,0,0,1 y el polinomio es: X^5, X^4, X^3, X^0.
+		Tanto el transmisor como el receptor escogen un polinomio generador G(X). El frame debe ser más largo que el polinomio G(X).
+			~ El polinomio generador ya esta estandarizado.
+
+		~ Los errores de ráfagas generan daños en grupos de bits.
+		~ Por ello, el código de integridad debe codificar la paridad de la forma más desordenada posible para ser mas robusta en frente de este tipo de errores.
+		~ Campos de Galois: Es una estructura matemática que que tiene 1 solo operador, el XOR.
+			~ Permite generar máquinas secuenciales lineales, trabajando con flip-flops de tipo D y XOR. (Bastante baratas)
+
+		Algoritmo para el Cálculo del CRC:
+
+			1- Sea G(X) el polinomio generador y sea M(X) el polinomio correspondiente al mensaje
+			2- Sea r el grado de G(X) y m el número de bits de M(X).
+			3- Obtener: X^r M(X), o sea, agregar r ceros al final de M(X).
+			4- Calcular (en modulo 2): (X^r M(X) / G(X) . Sera R(X) el resto de la división.
+			5- Restar (en módulo 2) a X^r M(X), R(X) 	(Se concatena M(X) + R(X)
+			6- El resultado T(X) se transmite
+			7- En el receptor, se divide T(X) por G(X). Si el resto es cero, no hay error.
+
+		Ejemplo:
+			Mensaje:		1101011 (m=7)
+			M(X):		x^6 + x^5 + x^3 + x + 1
+
+			Polinomio Generador:	101 	(r=2)
+			G(X):		x^2 + 1
+
+			X^r M(X) 	= x^8 + x^7 + x^5 + x^3 + x^2
+
+			X^r M(X) / G(X) = x^8 + x^7 + x^5 + x^3 + x^2	/ x^2 + 1
+					  x^8   x^6
+					----------------------------
+					        x^7 + x^6 + x^5 + x^3 + x^2
+						x^7         x^5
+					-----------------------------------
+						x^6 + x^3 + x^2
+						x^6   x^4 
+					-----------------------------------
+					 	x^4 + x^3 + x^2      
+						x^4         x^2
+					-----------------------------------
+						      x^3
+					              x^3   x
+					-----------------------------------
+							x			<--- resto!
+				
+				(operacion en campos de Galois)
+					= x^6 + x^5 + x^4 + x^3 + x
+
+			Se agregan r ceros al mensaje:
+
+				110101100
+			Resto = 10
+			T = 110101110
+
+
+	* Checksum
+
+		~ Seguridad en capas superiores, ya no se tienen circuitos electrónicos para realizar directamente el checkeo.
+		~ Por ello, se buscan algoritmos de computación a nivel del software para el checkeo, tratando de que sean lo mas simple posible.
+		Este método lo usa el protocolo IP de internet
+		La idea es sumar todas las palabras que se transmiten y transmitir el resultado de la suma al final del mensaje.
+			~ La suma se realiza en complemento 1.
+		El resultado se llama Checksum
+		Este método no se usa a nivel de link.
+		A diferencia de CRC, no tiene propiedades tan fuertes de corrección.
+		Es fácil de implementar por software.
+
+ 5- Transmisión Confiable de Frames:
+
+	~ ¿Que hacemos después de detectar un error?
+	Los frames se pueden corromper
+	Un protocolo de Enlace de datos debe ser capaz de recuperar frames perdidos y corruptos de alguna manera.
+	Para esto se usan dos mecanismos:
+		- ACK: frame corto de control, o sea, sin datos
+		- Timeouts: Acción de esperar un tiempo razonable
+	Si el transmisor no recibe ACK después de un tiempo razonable, se retransmite el frame original.
+
+	* Protocolos ARQ (Automatic Repeat Request)
+
+		- Estrategia general de usar ACK y timeouts para implementar despacho confiable.
+		- Dentro de la Capa de Enlace de Datos del modelo OSI.
+		- Dentro de los protocolos ARQ están:
+
+			- Stop & Wait
+			- Ventanas deslizantes:
+				~ Gran eficiencia, utilizado por el protocolo TCP.
+
+		* Stop & Wait
+
+			Este protocolo es el esquema ARQ más simple
+			~ Se espera un tiempo X esperando la respuesta ACK.
+				~ El timeout se calibra a travez del calculo del RTT (Round Trip Time).
+			~ Así estamos seguros de que el paquete halla llegado correctamente.
+
+			Casos posibles:
+				- Se pierde el frame original: Se envia de nuevo el frame despues del timeout.
+				- Se pierde el ACK: Ponerle una etiqueta con números de secuencia. Si me llega 2 veces la misma, una la rechazo.
+
+				Que pasa si en vez de ACK utilizamos el NACK?
+				(...)
+
+			- Muy bajo rendimiento de uso de la capacidad del Link.
+
+		* Ventanas Deslizantes
+
+			* Ventana del Transmisor
+	
+				1- Se asigna un número de secuencia a cada frame "NumSec"
+				2- Se mantienen 3 variables:
+					~ TVT = Tamaño Ventana Transmisor
+					~ URR = Último Reconocimiento Recibido
+					~ UFT = Último Frame Transferido
+	
+				Regla para el transmisor:
+	
+					UFT - URR <= TVT
+	
+				~ Hay un buffer donde almacenamos todos los frames que vamos a transmitir.
+
+
+			* Ventana del Receptor
+
+				1- Cuando llega un ACK, el transmisor mueve URR a la derecha permitiendo transmitir un nuevo frame.
+					- El transmisor también asocia un timer a cada frame.
+					- En la ventana de transmisión se mantienen los frames transmitidos en un buffer a la espera de reconocimiento.
+	
+				2- Mantiene 3 variables:
+					~ TVR = Tamaño Ventana Receptor
+					~ SFE = Siguiente Frame Esperado
+					~ UFA = Ultimo Frame Aceptado
+			
+				Regla para el receptor:
+		
+					UFA - SFE + 1 <= TVR
+			
+				~ Si llega un paquete con un numero de secuencia contenida en el TVR -> Lo aceptamos y guardamos en el buffer
+					~ Solo enviamos el paquete a la aplicación al recibir el siguiente paquete de la secuencia.
+				~ Si llega un paquete con un numero de secuencia no contenida en el TVR -> Se ignora
+			
+		
+			* Números de Secuencia Finitos
+
+				- Los números de secuencias no pueden ser infinitamente largos. En la práctica está limitado por el espacio disponible en el header del frame.
+				- Con tres bits, los numeros posibles son: 0,1,...7
+				- Es necesario reutilizar números, lo cual obliga a distinguir entre distintas encarnaciones de la misma secuencia de números.
+				- Esto significa que la secuencia debe ser mayor que los frames que están en camino.
+					-  Por ejemplo, Stop & Wait, considera un frame en camino y dos números de secuencia.
+
+				¿Cuantos números de secuencia se necesitan?
+					Se puede demostrar que se debe cumplir que:
+		
+					TVT < (Total de N` de secuencia disponibles +1 ) /2, siempre cuando que el TVT = TVR
+		
+					Intuitivamente esto significa que el protocolo de ventana deslizane alterna entra las dos mitades del espacio de números de secuencia.
+		
+				Ejercicio Certamen: 
+		
+					<----------------------------	L = 4000 Km -------------------->
+					Trans								Reciever
+								BW = 64 Kbps
+								Largo del frame = 1 KB
+			
+					Determinar:
+							a) TVT
+							b) N` de bits de secuencia
+		
+							TVT == TVR
+					Para la casa, lo mismo pero TVR == TVT/2
+		
+					a) TVT >= UFT - URR
+		
+						UFT --> Ultimo frame transmitido.. por lo que tenemos que saber cuantos frames se transmitieron antes de recibir de vuelta el AWK
+						
+							
+					¿Cuantos frames entran en el link?
+						C= 2.3 x 10^8 m/seg`
+							Cuantos frames caben? ventana? etc.
+						
+								 <- L ->
+								 |     |
+								||     |
+								||     |
+								||     |
+								||     |
+								||     |
+
+
+------------------------------------------- FIN Capítulo 3 -----------------------------------------
+
+4- Redes de Enlace Directo
+
+ 1- Introducción
+
+	- Examinaremos el problema de acceso al medio que imponen las redes de acceso múltiple a través de un protocolo llamado CSMA.
+	- Protocolos de Acceso Múltiple:
+
+		- Random Access
+			- MA
+			- CSMA
+			- CSMA/CD
+			- CSMA/CA
+
+		- Controlled Access
+			- Reservation
+			- Polling
+			- Token Passing
+
+		- Channelization
+			- FDMA
+			- TDMA
+			- CDMA
+
+ 2- Fundamentos Teóricos
+
+	* Compartir estaticamente un ancho de banda: TDM o FDM
+		- Generamos N canales para dividir el ancho de banda.
+		~ Costo inmediato de la latencia de transmicion.
+		~ No hay escalamiento: La incorporacion de una nueva estacion compromete el BW global.
+		
+	* Asignar dinamicamente el BW
+
+		* Metodos de acceso multiple a un medio compartido
+		* El sistema Aloha
+	
+
+ 3- El Sistema Aloha
+
+	- Cada terminal tiene un equipode comunicaciones (conectados a un computador central)
+	- Los usuarios transmiten cuando tienen datos. Como cada terminal es independiente, pueden ocurrir 
+		colisiones que corrompen los datos transmitidos.
+	- Las estaciones saben si ocurrio una colision escuchando su canal de salida.
+	- Si ocurrio colision, las estaciones esperan un tiempo aleatorio antes de retransmitir.
+		(si no fuera aleatorio, no terminarian las colisiones).
+	- Los sistemas que operan de esta forma se denominan Sistemas de Contencion.
+
+
+	* Aloha Puro (Abramson)? = 0 sincronismo
+
+		- Interesa conocer la faccion de los frames transmitidos que no sufren colisiones.
+		t_f 	= Tiempo de frame, tiempo promedio que toma transmitir un frame
+		S 	= Numero Promedio de frames generados en un tiempo de frame. S < 1
+		G 	= Numero de frames generados en un tiempo t_f = CARGA DEL CANAL
+
+		~ Si S > 1 = Todos los frames sufren colision
+		~ La generacion de S y G se puede modelar como un proceso de Poisson
+
+		* El Controlador Electronico
+			- La retransmision se produce automaticamnet e por el controlador electronico.
+			- El controlador bloquea al terminal cuando hay retransmisiones
+			
+			~ P_0 = Probabilidad que un frame no sufra colision
+			~ P_0 = S / G
+
+			P_r[k] = G^k e^(-G)	P_r[0] = e^(-G)
+				-----------
+				    (k!)
+			~ Como al evaluar con t_f pueden haber colisiones de los frames, para analizar la probabiliad 
+			 de que no hallan coliciones (P_0) se debe tomar en cuenta  2.t_f
+
+				P_0 = e^(-2.G)
+
+
+			~ Por lo tanto, un sistema Aloha puro tenemos como desempeño maximo de un 18% con G = 0.5
+
+					S = G. e(-2.G)
+
+
+	* Mejora: Aloha Ranurado
+
+		~ Obligar a los frames a no transmitir en cualquier momento
+		- Tiempo vulnerable restringido a t_f:
+
+			P_0 = e^(-G)
+
+		~ Sincronizacion con un reloj global
+		~ 36.8% maximo de desempeño con un G = 1.
+
+		(aprenderse gráficos)
+
+ 4- Protocolos CSMA (Carrier Sense Multiple Access)
+
+	- Los protocolos en los cuales las estaciones escuchan antes de transmitir.
+	- En caso de redes LAN, es posible detectar lo que hacen otras estaciones, y de esta forma adaptar el comportamiento.
+	~ Robert MetCalfe: Padre de las redes Ethernet, trabajo en Xerox y despues fundo DICOM?
+
+	* LAN CSMA
+
+		- Medio comun, dividiendo el ancho de banda dinamicamente.
+
+		CSMA 1-persistente:
+
+			- Cuando una estacion quiere transmitir, primero escucha
+			- Espera si esta ocupado
+			- Si esta desocupado, transmite
+			- Si ocurre una colision, espera un tiempo aleatorio y vuelve a retransmitir
+			~ Se denomina 1-persistente porque se transmite con probabilidad 1 al encontrar 
+			 el canal desocupado
+			~ Sensible a los retardos de la linea 
+			 (se puede creer que esta vacio el canal cuando no es asi)
+
+		CSMA p-persistente:
+			- Se aplica a canales con ranuras de tiempo
+			- Si esta desocupado, transmite con probabilidad p
+			- Con probabilidad q=1-p difiere la transmision hasta la proxima ranura.(no transmite)
+
+
+
+		* CSMA/CD (CSMA con detección de colisiones)
+
+			- Una mejora posible a los protocolos anteriores es dejar de transmitir al detectar una colisión.
+			- Con esto se gana tiempo ya que el frame estará corrupto.
+			- Cuando una estación detecta una colisión asegura una transmisión de una fracción mínima del frame.
+				- Esta fracción se denomina JAM y su objetivo es alertar a las demás.
+			~ en el fondo, las colisiónes llevan a dejar de transmitir despues de transmirir un cierto número de bits...
+			~ Cuando hay una  colisión, la energía del canal aumenta a otro nivel.
+
+			- En este modelo, el protocolo puede estar en 3 estados:
+				- Contención	:	(Colisión-Retrasmisión)* hasta que se resuelve
+				- Transmisión	:	Inyección de datos de solo un host
+				- Ocioso	:	Nadie Transmite
+
+			- Al detectar una colisión las estaciones dejan de transmitir, esperan un período aleatorio e intentan nuevamente.
+
+
+			~ David Bohem: Estudio la comunicación humana. Analisó el dialogo en grupos de personas, y vió que cuando uno dialoga, no se responde al mismo tiempo.
+				~ Uno interiorariza las ideas, y despues responde.
+
+			~ En los antiguos adaptadores (HUBs) cuando hay colisión, hay unas luces que se preden y se apagan.
+
+			~ Grafica de desempeño: omg la mejor que se veia era la 0.01-persistente CSMA, pero hay que ver otros parametros tambien, como la latencia.
+
+------------------------------------------- FIN Capítulo 4 -----------------------------------------
+
+5a- Redes LAN Eth y Token Ring
+
+ 1- Introducción
+	- En este capítulo, estudiaremos las redes LAN centrándonos en los dos estándares más difundidos: Ethernet y FDDI
+	~ Podemos consisderar a las redes como un éxito de la Ingeniería: se han mantenido practimante durante casi 40 años.
+	- Tanto Ethernet como FDDI son Redes de Enlace Directo. Sus fundamentos están en las ideas expuestas en el capítulo anterior: Redes de enlace directo.
+
+ 2- Redes Ethernet
+
+	* CSMA/CD Ethernet
+		- Es la más existosa LAN. Se desarrolló en los años 70 en los laboratorios XEROX.
+		- Soporta 10 Mbps en su forma estándar
+		- Se ha mantenido durante mucho tiempo
+		~ Ethernet considera una topología de bus, de broadcast, medio compartido.
+		~ Protocolo CSMA/CD 1-persistente
+		~ Cual es el protocolo para poder acceder al medio y poder transmitir? protocolo MAC
+
+	* Segmento Ethernet:
+		- Segmento Ethernet: largo 500m, con un máximo de 50m entre el host y el segmento
+		- Máx estaciones = 100 por segmento y 1024 en total
+		- Entre dos estaciones no pueden haber más de cuatro repetidores.
+			~ Cada repetidor aumenta más la latencia a la red.
+		- Un repetidor es un amplificador de señales digitales.
+		- El largo máximo entre dos hosts es de 2500m (4 repetidores)
+		- Ethernet transmite en banda base codificado en Manchester.
+
+		- La tecnología original de 10Mbps usando cables coaxiales de 50 ohm de impedancias se llamaba 10Base 5 (10Mbps, Banda Base, 500m).
+		- Otra tecnología mas barata (coaxial más delgado) se denomina 10Base 2(10Mbps, Banda Base, 200m)
+		- Actualmente la tecnología más utilizada es llamada:
+			10Base T:
+				- 10Mbps
+				- T: Par trenzado (típico categoría 5 UTP)
+				- Limitada a segmentos de 100 metros.
+
+		~ Con 10Base5 se usa conexión con transceiver: una ``aguja'' que se inserta en el transceiver
+		- Con 10Base2 no es posible usar Transceiver por lo delgado del coaxial. Se usa un esquema Daisy Chain con conectores tipo T.
+			~ Muy alto el nivel de fallas en la red.
+
+		~ Esto se solucionó con el uso de HUBs (repetidores de varias vía)
+			- La configuración usual con 10BaseT es tener muchos segmentos punto a punto conectados por un repetidor de varias vías llamado HUB
+			- Todos los Host están en el mismo dominio de colisión.
+				~ Esto es un problema!
+
+		* Formáto de un Frame
+			64b		48b		48b		16b	???	32b	8b
+			Preámbulo	direc. destino	direc. Fuente	Tipo	Datos	CRC	Postámbulo
+					|===========   header 14B   ===========|
+
+			Preámbulo: Secuencia para establecer el sincronismo
+			CRC: Control de Redundancia Crítica
+			Tipo: Es la Demux Key. Sirve para identificar protocolos de alto nivel. En el estándar IEE 802.3 este campo se cambia por el largo.
+				~ En campo Tipo diferencia el protocolo Ethernet y el IEEE 802.3
+			Datos:  Hasta 1500 Bytes, el mínimo es 46B. El sentido es mantener un largo suficiente que permita detección de colisión
+			Header: Está formado por las direcciones destino, fuente y el tipo.
+
+			~ Ethernet es un protocolo cerrado de XEROX
+			~ IEEE 802.3 es abierto... pero el que se usa es Ethernet xD
+
+		* Algoritmo de Colisión
+		
+			- Corresponde a CSMA/CD 1-persistente.
+				- Si se detecta colisión, se espera 0 o 1 intervalo de tiempo d.
+				- A la segunda colisión, se espera 0,1,2 o 3 intervalos d aleatoriamente
+				- Después de la colisión i, se elige un número entre 0 y 2^i -1
+				- El número máximo de intentos es 16. Después de esto, se reporta al host error de transmisión. 
+				- Esta técnica se conoce como ``backoff exponencial''
+				- En otras palabras, los intervalos de espera son k x d con k=0..2^n -1  y d=51,2 useg
+
+
+			- Cuando el adaptador detecta una colisión, debe asegurar que se transmitan 32b antes de parar (JAM).
+			- Esto significa que el frame más chico en caso de colisión contiene 96b (32 de secuencia de JAM y 64 bits de preámbulo).
+			- Una vez detectada la colisión y detenido la transmisión, se espera cierto tiempo antes de volver a intentar.
+			~ El JAM permite que las demas estaciones detecten que hubo colisión.
+
+	* Tamaño Mínimo del Frame
+			- 64 Bytes (se calcula viendo el time slot para una red ethernet con largo máximo (2500m) tomando el peor caso (2t = RTT = 45 useg) a 10Mbps.)
+
+	* Direcciones
+
+		- La dirección pertenece al adaptador y no al Host
+		- Las direcciones se expresan en hexadecimal.
+			Por ejemplo:
+
+			0000 1000	0000 0000	0010 1011
+
+			1110 0100	1011 0001	0000 0010
+
+				8:0:2b:e4:b1:2
+
+
+		- Cada fabricante tiene asignado un prefijo diferente de un determinado largo. Por ejemplo 20 bits.
+
+	* Recepción:
+
+		- Cada frame transmitido es recibido por cada adaptador conectada a la red.
+		- Cada adaptador reconoce los frames que tienen su dirección y se lo pasan al host.
+		- Tambien un adaptador se puede programar en modo promiscuo. En este caso todos los frames que le llegan son pasados al host.
+		- Además de frames unicast, si el campo de dirección contiene sólo unos, es tratado como broadcast.
+		- Cuando el bit más significativo de un frame que no es broadcast contiene un 1, es tratado como multicast
+
+	* Evolución de Ethernet:
+		- A través de los años, Eth. ha pasado por una serie de pasos evolutivos. En la actualidad es muy distinta a la original 10Base5.
+		- La mayoría de las instalaciones actuales consideran las estaciones conectadas a switches a través de cables punto a punto ya sea con cobre o fibra.
+		- A mediados de los años 90, Eth se estandarizó a 100Mbps. Se preservó el protocolo MAC y el formato de frame, pero se modificaron las capas físicas.
+
+
+		- Capas Físicas 100Mbps:
+
+			- Cobre: 100BaseT
+			- Fibra: 100Base-FX, 100Base-SX, 100Base-BX
+			- La limitación para cobre son 100m. En fibra puede ser de varios kilómetros.
+
+			~ Al aumentar la frecuencia, hay que reducir las distancias, ya que nos aumenta la ventana de colisión. 
+			~ La fibra óptica no tiene colisiones. No es un medio ``broadcast''. Uno no puede ``insertar'' haces de luz entre medio del canal.
+
+			- Gigabit Eth es una extensión nautral del estandar, y mantiene compatibilidad total con el equipamiento Eth instalado.
+				- El estándar es IEEE802.3z
+
+			~ 100 y Giga es punto a punto, no es broadcasts. No podemos hablar de Hubs o multivías.
+			~ Aún asi, Giga soporta colisiones! hubs, llamados buffered distributors.
+				~ Pero tiene mejor desempeño utilizando tecnologias punto a punto o otros protocolos.
+
+ 3- Redes Token Ring (FDDI)
+
+			- Existen muchas formas:
+				- FDDI (Fiber Distributed Data Interface)
+					- Usa un anillo doble por razones de seguridad (uno en cada sentido).
+				- PRONET (10 Mbps - 80 Mbps) una de las primeras
+				- IBM 4-Mbps
+				- IEEE 802.5 16Mbps
+
+			- FDDI engloba a la mayoría
+
+			~ Compartir el medio y establecer cotas en la red.
+			~ Asignación de banda Round Robin?
+
+			- El anillo se puede ver como un único medio compartido.
+			- Algoritmo distribuido de acceso al medio.
+			- Los nodos ven todos los frames.
+
+			* El Token
+
+				- Un token corresponde a una secuencia especial de bits (3 bytes).
+				- Si un nodo desea transmitir, debe preimero esperar que le llegue el token, y lo retiene hasta que termina de transmitir.
+
+				- Un token corresponde a una secuencia especial de bits.
+				- Si un nodo desea transmitir, debe primero esperar que le llegue un token.
+
+				¿ Cuanto mide un bit?
+				Si tenemos una velocidad de 2x10^8 mseg, a 100Mbps:
+						T = 10^-8 seg
+						V = d / t
+						2x10^8 x 10^-8 = 2 metros!!!
+
+			* Conexión de nodos
+
+				- Cada nodo se conecta al anillo por 4 fibras.
+
+				-DA: 	Dual Attachment
+				-DAS: 	Dual Attachment Station
+				-DAC: 	Dual Attachment Concentrator
+				-SA:	Single Attachment
+				-SAS:	Single Attachment Station
+				-SAC:	Single Attachment Concentrator
+
+			* Buffer de Elasticidad
+
+				- Cada estación tiene un buffer
+					- 9 a 80 Bits
+
+				- El buffer de elasticidad produce un retardo.
+				~ El anillo tiene 2 retardos:
+					 retardo propio del tiempo de vuelo
+					 retardo del buffer de las estaciones. Máximo 80 Bits x estacion del token ring.
+
+			* Especificaciones de FDDI
+
+				- A lo más 500 estaciones (hosts)
+				- Entre cada par de estaciones una distancia máxima de 2km.
+				- El límite es de 200km de fibra (como es dual, se límita a 100 km)
+				- Acepta como medio físico Fibra óptica, coaxial y par trenzado.
+				- Se codifica en 4B/5B.
+
+			~ Al ser round robin, no existe la incerteza del tiempo. No es una ruleta!
+
+			* Algorimo FDDI: Retención del Token
+
+				¿Cuántos datos puede transmitir un nodo al tomar el token?, o mejor, ¿Cúanto tiempo un nodo puede retener el Token?
+			
+				Parámetros:
+					- THT: Token Holding Time.
+
+						- Criterios: Si THT = inf... el nodo puede transmitir todo lo que quiera.
+						- ¿Y si hay otro nodo esperando con un mensaje corto?
+
+					- TRT: Token Rotating Time: Tiempo que toma un Token en dar vuelta el anillo, visto desde un nodo dado:
+
+						- TRT <= Nodos_activos x THT + Latencia_Anillo
+
+						~ Latencia_Anillo: Tiempo que toma el token en dar vuelta cuando nadie más tiene datos que enviar.
+
+				- Hay que asegurar que un nodo pueda transmitir dentro de un cierto tiempo.
+				- En otras palabras hay que fijar una cota superior a TRT observada por cualquier nodo.
+				- Asegura una latencia máxima en la red.
+	
+					- TTRT: Target Token Rotation Time
+					~ TTRT define la cota superior de TRT
+
+					- ¿Cómo se hace?
+						- Cada nodo mide el tiempo transcurrido entre llegadas sucesivas del Token.
+						- Este tiempo se donmina TRT_medido.
+
+				* Situaciones:
+					- TRT_medido > TTRT el token está atrasado y el nodo no transmite.
+					- TRT_medido < TTRT el token está adelantado y puede transmitir un tiempo dado por:
+
+						TTRT - TRT_medido
+
+					Con esto se arregla una parte, pero hay datos que tienen restricciones de retardo (voz, video, ...)
+
+				* Tráfico sincrónico y asincrónico
+					- Cuando un nodo recibe el tokem, siempre puede transmitir datos sincrónicos independiente de si el token está atrasado o adelantado.
+					- Sólo puede transmitir datos asincrónicos sólo si el Token está adelantado.
+
+					- Tráfico Sincrónico: Sensible al retardo
+					- Tráfico asincrónico: Le interesa mas el throughput.
+
+					La cantidad mázima de datos sincrónicos que se puede enviar durante una rotación del token está limitado por TTRT:
+
+						- El peor caso, significaria que el TTRT medida tome 2 x TTRT
+
+					- Al notar que si el tráfico sincrónico ha consumido ya un TTRT de tiempo, entonces los nodos con datos asincrónicos no pueden enviar datos ya que el token está atrasado.
+					- Pero lo tanto sólo es posible tener rotaciones completas del token que tomen 2xTTRT de tiempo en una rotación simple, pero nunca en sucesivas rotaciones
+
+					* Tráfico Sincrónico
+					
+						¿Como sabe un nodo si puede enviar tráfico asincrónico?
+							- siempre que TRT_medido < TTRT.
+						¿y qué pasa si el tiempo que queda no es suficiente para enviar un mensaje?
+							- en este caso el nodo puede enviar lo que requiere.
+
+						Consecuencia:
+						- TRT_medido <= TTRT + tiempo que toma enviar un frame.
+
+				* Liberación del Token:
+
+					- 2 Alternativas:
+						- Inmediate release --> Este sistema es mucho mejor
+						- Delayed release.
+
+				* Formato del frame:
+
+						8b	8b		48b		48b		32b	8b		24b
+					comienzo_frame	control	direc_destino	direc_fuente	Cuerpo	CRC	Fin_de_Frame	Status			
+
+					<---------------------------- max 4500B ----------------------------------------------------->
+
+					Control:
+						Acces control:	- Token Bit
+								- Monitor Bit
+								- Priority Bit
+								- Reservation Bits
+	
+						Frame control:	- Distingue entre datos y tramas de control
+
+					Frame status:	- Contiene bits A y C.
+							- Al pasar por una estación, se prende A y si la copia se prende C.
+							- A = 0 y C = 0, destino inalcanzable o apagado.
+							- A = 1 y C = 0, destino presente pero trama no fue aceptada.
+							- A = 1 y C = 1, destino presente y trama aceptada.
+
+ 4- Adaptadores de Red
+
+		(no los hemos visto en clases, pero igual lo pongo porsiaca):
+
+		- Se implementan en estos:
+			- Construcción de frames.
+			- Detección de errores.
+			- Acceso al medio.
+
+		- Un adaptador es específico a una determinada arquitectura
+
+		(... detalles que veremos mas adelante ...)
+
+
+------------------------------------------- FIN Capítulo 5 -----------------------------------------

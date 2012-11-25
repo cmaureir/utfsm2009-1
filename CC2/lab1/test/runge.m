@@ -1,0 +1,16 @@
+function Y=runge(delta,beta,alpha,gamma,omega,t,y1,y2)
+	Y1=y1;
+	Y2=y2;
+	t0=t;
+	h=0.1;
+	k1=h*y2;
+	l1=h*(-delta*y2-beta*y1-alpha*y1^3+gamma*cos(omega*t));
+	k2=h*(y2+l1/2);
+	l2=h*(-delta*(y2+l1/2)-beta*(y1+k1/2)-alpha*(y1+k1/2)^3+gamma*cos(omega*(t+h/2)));
+	k3=h*(y2+l2/2);
+	l3=h*(-delta*(y2+l2/2)-beta*(y1+k2/2)-alpha*(y1+k2/2)^3+gamma*cos(omega*(t+h/2)));
+	k4=h*(y2+l3);
+	l4=h*(-delta*(y2+l3)-beta*(y1+k3)-alpha*(y1+k3)^3+gamma*cos(omega*(t+h)));
+	y1=y1+(k1+2*k2+2*k3+k4)*(1/6);
+	y2=y2+(l1+2*l2+2*l3+l4)*(1/6);
+	Y=[y1;y2];

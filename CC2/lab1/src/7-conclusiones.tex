@@ -1,0 +1,33 @@
+Antes definamos Velocidad de convergencia 
+La velocidad de convergencia de un método  iterativo está dada por el número de  iteraciones que son
+necesarias  para  alcanzar  un  cierto  grado  de  exactitud.  Puesto  que  es  muy  difícil  obtener  valores
+absolutos  de  velocidad  de  convergencia,  los  distintos métodos  se  suelen  encasillar  por  su  orden  de
+convergencia.
+
+Sea $e_{n+1}$ el error que se tiene en la determinación de la raíz en la iteración $n+1$
+
+$$e_{n+1}=x_{n+1}-x^*$$
+
+Se define un Algoritmo iterativo de orden $m$ como aquel que cumple
+
+$$ \displaystyle\lim_{x \to\infty}{\frac{\left |{x_{n+1} - x^*}\right |}{\left |{x_n - x^*}\right |^m}} = \displaystyle\lim_{x \to\infty}{\frac{\left |{e_{n+1}}\right |^m}{\left |{e_n}\right |}}  = K_m $$
+
+en donde $K_m$ es una constante llamada error asintótico. En general se tiene convergencia lineal si $m = 1$ y convergencia cuadrática si $m = 2$.
+Otra forma de interpretar el límite es diciendo que para n “suficientemente grande”,
+
+$$ \left |{e_{n+1}}\right | = K_m \left |{e_n}\right |^m $$
+
+Puesto que para valores grandes de $n$, en es un número pequeño, la velocidad de convergencia crece exponencialmente con el orden de convergencia. Por lo que es deseable un orden alto de convergencia.
+Veamos el orden de convergencia del método de iteraciones de punto fijo o Lipschitz. Para ello debemos calcular la dependencia que existe entre $e_{n+1}$ y $e_n$. Usemos el desarrollo por series de Taylor de la siguiente manera:
+
+$$ e_{n+1} \\ =  x_{n+1} - \alpha \\ =  \varphi(x_n) -  \varphi(\alpha ) \\ =  \varphi(\alpha )+ \varphi'(\alpha )(x_n - \alpha )+\frac{1}{2} \varphi''(\alpha+ \theta e_n)e_n^2 -  \varphi(\alpha ) \\ =  \varphi'(\alpha )(x_n-\alpha )+\frac{1}{2} \varphi''(\alpha +  \theta e_n)e_n^2 $$
+
+Observemos en la última igualdad que, a menos que $ \varphi'(\alpha) = 0 $, el algoritmo de las iteraciones sucesivas
+converge linealmente a la solución. Por otra parte, obtenemos la condición de convergencia cuadrática del método que es, $ \varphi'(\alpha) = 0 $.
+\\\\
+Una ventaja del método de Lipschitz consiste en su gran sencillez y flexibilidad para elegir la forma de $ \varphi'(\alpha)$. Sin embargo, es muy importante la formación de la función $ \varphi'(\alpha) $ en la ecuación $ x = \varphi'(\alpha)$; de las múltiples opciones que pueden existir, ya que no siempre converge con cualquier forma elegida de $ \varphi'(\alpha) $.
+\\\\
+De la misma manera se puede obtener que la velocidad de convergencia del metodo de Newton Raphson es del orden 2 y el error absoluto entre la aproximación actual y la aproximación anterior es proporcional al cuadrado del error calculado en la anterior iteración, por lo cual pude afirmarse que cada iteración duplica el número de dígitos correctos en la aproximación, lo que hace que este metodo sea mas eficiente que las iteraciones de Lipschitz (que es de orden lineal), por estas razones es que es un algoritmo altamente utilizado. Pero, a pesar de que el método de Newton Raphson es muy eficiente, hay situaciones donde se comporta de manera deficiente.
+
+
+

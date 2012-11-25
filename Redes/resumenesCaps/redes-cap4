@@ -1,0 +1,122 @@
+CAPITULO 4 - Redes de Enlace Directo
+
+2) Fundamentos Teoricos
+
+* una LAN, es una red que busca interconectar un cjto limitado de pc
+* problema: ¿como interconectar un cjto de N pares de pc?
+* Solucion con TDM o FDM
+   -Usarlos para generar N canales dividiendo el BW de los links
+* Asignacion Estatica de Canales
+   -Usando equipos TDM o FDM se divide BW, BW/N (Asignacion Estatica)
+* Observaciones
+   -BW se reduce -> retardo
+   -No hay escalamiento -> meter otro pc, afecta al BW global
+
+3) El Sistema Aloha
+
+* 1970 Universidad Hawai
+* Metodo para asignacion de canales
+* Motivacion: conectar via radio un pc central con terminales en varias islas
+* Protocolo:
+   -Cada terminal tiene un equipo de comunicaciones
+   -los users transmiten cuando tienen datos (terminales indp -> colisiones)
+   -las estaciones saben si ocurrio una colision escuchando canal de salida
+   -si ocurrio colision -> est esperan un tiempo random antes de retransmitir
+   -A los sistemas que operan de esta forma se denominan Sistemas Contencion
+* Analisis:
+   -Tf = tiempo de frame, tiempo promedio que toma transmitir uno
+   -S = nro promedio de frames generados en un Tf (S<1)
+   -Aparte de frames que generans users, las colisiones generan tbn
+	En total se generan G frames en Tf
+	G = carga del canal
+   -Cargas bajas: S<0 y S>G
+   -Cargas altas: G>S
+   -S = desempeño de la red
+   -G = trafico ofrecido o carga del canal
+   -¿Que fraccion de todos los frames transmitidos se escapa
+    de tener colision bajo estas caoticas condiciones?
+   -Relacion:
+	S = S(G)
+   -Si S > 1, todos los frames sufren colision
+   -Si 0 < S < 1 es lo razonable
+   -El controlador electronico, se encargade retransmitir automaticamente
+	-bloquea las terminales cuando retransmite
+
+   -Bajo cualquier condicion de carga:
+	S = G x Po
+	Po = probabilida que un frame NO sufra colision
+	Probabilidad k frames generados en un Tf, distribucion Poisson
+   -Como necesitamos calculas Po, totamos 2 Tf
+	Po = e ^ (-2G)
+	S = G x e ^ (-2G)
+	Esto es Aloha puro, es decir, las estaciones pueden transmitir
+	en cualquier momento (modelo de tiempo continuo)
+
+* Aloha Ranurado
+   Po = e ^ (-G)
+   S = G x e ^ (-G)
+
+* Desempeño
+   -Aloha Puro:
+	S = 18% , para G = 0.5
+	Si G > 0.5 el sistema esta sobrecargado
+   -Aloha Ranurado:
+	S = 36% , para G = 1
+	Si G > 1 el sistema esta sobrecargado
+
+   -Diagrama (y=S el %/100, x=G)
+
+
+
+4) Protocolos CSMA
+
+* Lo mejor que se puede lograr con el protocolo Aloha es una utilizacion del 36.8%
+* Con las redes LAN, es posible detectar que hacen otras estaciones, y asi adaptar comportamiento
+* Posibilidad, escuchar el medio para saber si esta ocupado.
+* Los protocolos que escuchan antes de transmitir se llama CSMA (Carrier Sense Multiple Access)
+
+
+* Protocolo CSMA 1-persistente
+   -Cuando 1 estacion quiere transmitir, primero escucha el canal para ver si ta desocupado
+   -Si esta ocupado, espera a que se desocupe
+   -Si el canal esta desocupado, transmite un frame
+   -Si ocurre alguna colision, espera un tiempo random y vuelve a retransmitir
+   -su nombre porque, se transmite con prob 1 al encontra el canal desocupado
+   -Protocolo sensible a los retardos de linea
+   -Comportamiento mejor que el ALOHA
+
+* Protocolo CSMA no-persistente
+   -Busca introducir mejoras al 1-persistente
+   -Antes de transmitir, escucha el canal
+   -Si esta desocupado, transmite
+   -Si esta ocupado, espera tiempo random y vuelve a escuchar
+   -La diferencia con el 1-persistente es que la estacion no queda escuchando para inmediatamente coger el canal.
+
+* Protocolo CSMA p-persistente
+   -Se aplica a canales con ranuras de tiempo
+   -Cuando quiere transmitir, escucha el canal
+   -Si esta desocupado, transmite con prob p y con prob q=1-p difiere la transmision hasta la prox ranura
+   -Si la ranura esta desocupada, vuelve a transmitir o difereir con prob p y q
+   -Si esta ocupado, actua como si hubiera colision (tiempo random, y volver a intentar)
+
+
+* CSMA/CD (CSMA con deteccion de colisiones)
+   -mejora posible a los protocolos anteriores -> dejar de transmitir si hay colision
+   -Se gana tiempo (ya que el frame estará corrupto)
+   -Cuando una estacion detecta colision, asegura una transmision de una fraccion minima del frame. (esa fraccion se llama JAM y su objetivo es alertar a las demas)
+   -El protocolo puede estar en 3 estados:
+	-Contencion
+	-Transmision
+	-Ocioso
+
+
+
+* Grafico Final (+ a -)
+   -CSMA 0.01-persistente
+   -CSMA No-persistente (ojo: sube como log, es raro...)
+   -CSMA 0.5-persistente
+   -CSMA 1-persistente
+   -Aloha Ranurado
+   -Aloha Puro
+
+  

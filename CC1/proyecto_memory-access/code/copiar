@@ -1,0 +1,5 @@
+#!/bin/sh
+HOME="/scratchbox/users/arm/home/arm"
+rm -fr $HOME/*
+cp -r ../code $HOME && chown arm.users $HOME/code && chown arm.users $HOME/code/*
+su - arm

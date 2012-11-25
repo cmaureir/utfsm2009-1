@@ -1,0 +1,62 @@
+CAPITULO 2 - Fundamentos de las Comunicaciones
+
+2) BW y latencia
+
+* BW: Numero de bits que se transmiten en un periodo de tiempo
+* Tiempo Propagacion = Tiempo de vuelo
+* Round Trip Time (RTT)
+   -tiempo de ida y de vuelta en vez del tiempo de propagacion (un sentido)
+* Latencia = Propagacion + Transmision + cola
+* Propagacion = Distancia / k * c
+* K = factor que depende del medio (vacio k=1)
+* Transmision = tamaño msj / BW
+* Tiempo de vuelo en distintos medios:
+   -Vacio         3.0x10^8
+   -Cobre         2.3x10^8
+   -Fibra optica  2.0x10^8
+* Bits en transito:
+   -numero de bits que se encuentran en transito en una red
+   -Nº bits en transito = Tiempo Propagacion x BW
+
+3) Transmision Analoga y Digital
+* Espectro de frecuencia de una señal
+* BW analogico
+   -tradicionalmente es un medida de BW de frecuencia
+   -BW = frecuencia a la cual la amplitud de la señal cae a 1/sqrt(2) de su valor
+* Todos los medios fisicos tienen BW limitado
+   -las señales digitales se distorsionan al pasar por medios fisicos de BW reducido
+   -Transmision Banda Base = transmision de señal digital sobre medios analogicos
+* Relacion BW digital (bps) BW analogico (Hz) por el teo de Nyquist
+* Si el medio fisico tiene BW, señal se codifica en N niveles discretos
+   -Velocidad Max = 2 x BW x log_{2}N [bps]
+   -Ecuacion que no considera efecto del ruido
+* Cota maxima de velocidad
+   -Teorema de Shannon
+	-Establece cota max para la cap de un canal en bps,en funcion de la relacion señal a ruido.
+	-Velocidad Max = BW x log_{2}(1+S/N) [bps]
+	-(S/N)_{db} = 10 x log_{10} (S/N)
+
+4) Codigos de Nivel uno (Transmision en Banda Base)
+
+* Señales viajan entre componentes de señalizacion
+* Los bits fluyen entre adaptadores
+* El comp. de señalizacion de un adaptador de Red permite transformar señales en sec de bits
+
+* Codigo NRZ (Non Return to Zero)
+   -El problema NRZ se produce con secuencias largas de 1s y 0s
+	-El receptor necesita sincronizarse
+	-Se necesita detectar presencia o ausencia de señal
+
+* Generacion de codigo Manchester
+   - NRZ <o excl> CP  = Manchester
+   -Dificulta: se dobla la razon a la cual se hacen las transiciones en un enlace (baud rate)
+   -Como el bit rate es la mitad del baud rate, es 50% eficaz
+
+* Codigo 4B/5B
+   -Busca resolver la ineficiencia del Manchester (sin mantener sec largas de 1s y 0s)
+   -Como pueden formarse muchos 1s, la salida se codifica en NRZI
+
+5) Bloques de HW para configurar redes 
+
+* Links
+   -Half Duplex (HDX) o Full Duplex (FDX, la mayoria) 

@@ -1,0 +1,265 @@
+
+	1- Logica: p => q	p,q son proposiciones (Aristoteles)
+		  -q => -p
+		  -p v q	Esto "es comprensible" por las maquinas! (metafora, un poco peligrosa)
+				(es capaz de leer una tabla logica)
+
+        2- Teoría aximatica de conjuntos: 	Ejemplo: p(n): n es primo ~~> M:= {2,3,5...} C |N		->   hay infinitos! TAREA: Presentar una demostracion
+
+
+	3- Induccion:	Ejemplo: 2^x >= X^2  para todo x E |N ^ x >= 4 TAREA
+				 SUM_k=1_n k^2 = Formula <- demostrar por induccion TAREA
+
+			Ejemplo2: Def. Inductiva de arbol (conexo)
+				(i) un nodo solo, es un arbol
+				(ii) si T_1,..,T_p son arboles, encontes:
+
+	4- Relaciones de equivalencia:
+
+		Una relacion de equivalencia de R sobre S es:
+			Refleja: ssi para todo a perteneciente a S: (a,a) pertenece a R.
+			Simetrica: ssi [(a,b) perteneciente a R => (b,a) pertenece a R] 
+			Transitiva: ssi para todo a,b,c perteneciente a S, (a,b) pertenece a R y (b,c) pertenece a R, => (a,c) pertenece a R]
+
+		1- Clases de R-Equivalencia
+			~ Clases de equivalencia R sobre un conjunto dado S, induce una particion de S en _clases de R-equivalencia_.
+			~ La coleccion de todas las clases de R-equivalencia recubren el conjunto S.
+		
+
+	5- Conjuntos Numerables
+		Se dice que un conjunto S es un numerable si existe una biyeccion entre S y |N.
+		
+		TAREA: S es un conjunto finito ssi....
+
+	6- Automatas
+		1- Definicion recursiva de los Zigma^i:
+			Zigma^i+1 = Zigma^i Zigma = { wx : w pertence Zigma^i y x pertence Zigma}
+
+		2- La Clausura de Kleene de Zigma:
+			Zigma* = Union de todas las secuencias: Zigma^0 U Zigma^1 U Zigma^2 ... ={ x_1, x_2, ... x_n : x_i pertence a Zigma, n pertenece a |N }
+			~ Notar que Zigma* no contiene una palabra de largo infinito, ya que infinito no pertence a los naturales.
+			
+		Una sucesion de largo k es una funcion:
+				 Sigma: N_k --> Zigma
+				 	1 ---->  Sigma(1)
+					  ....
+					k ---->  Sigma(k)
+				Con N_0 = vacio
+
+		~ Observacion: Un conjunto (no vacio) equipado con una operacion se llama semigrupo.
+		~ Otra operacion: Transposicion de strings
+
+		3- Clausura de relaciones sobre conjuntos
+				Objetivo: Determinar las clausuras p^0 , p^1, p^2, ... , p^k,... p^* de p.
+
+				Ejemplo:	p = {(a,c), (c,d), (d,a), (d,d)},  S = {a,b,c,d}
+
+					a	b	c	d			a	b	c	d
+				a			*			a	*
+				b						b		*
+				c				*		c			*
+				d	*			*		d				*
+						(p)						(p^0 (la diagonal))
+
+					a	b	c	d			a	b	c	d		
+                        	a			*			a				*	
+                        	b						b					
+                        	c				*		c	*				
+                        	d	*			*		d			*	...etc. (no esta completado)	
+                        			(p^1)						(p^2)			
+
+				TAREA: Hacer un programa que calcule los p^i de p.
+				TAREA: Termina este proceso? si, termina, cuando el siguiente que uno obtiene es el mismo que alguno anterior.
+
+		~ En el certamen nos va a preguntar "demuestre porque I^1 es igual a I".
+
+			A = (S, I, O, v, w)
+		
+			donde:	S = conjunto de estados
+				I = Alfabeto de entrada
+				O = Alfabeto de salida
+				v : Función de estado próximo o función de transición; v: SxI --> I
+				w : Función de salida; w: SxI --> O
+		
+			Nota: Casi todos los conjuntos son finitos.
+		
+			Recordando:
+				~ I^k son las palabaras o string de largo k construidas de caracteres tomados del alfabeto I
+				~ I* ->  Union de todas las palabras de largo k , y es contablemente infinito (TAREA: que significa que sea contablemente infinito?)
+		
+			Representaciones: Ej.
+		
+				s\x	0	1	0	1
+				s_0	s_0	s_1	a	a	
+				s_1	s_1	s_3	b	c	
+				s_2	s_4	s_2	c	b	
+				s_3	s_0	s_1	a	c	
+				s_4	s_3	s_2	b	a	
+		
+			"s_0, si recibe un 0 se queda en s_0 y tiene como salida 'a' "
+			"s_0, si recibe un 1 se dirige a s_1 y tiene como salida 'a' "
+			"s_1, si recibe un 0 se queda en s_1 y tiene como salida 'b' "
+			....
+		
+		
+				TAREA: Dise?ar un retardador de retardo 2.
+		
+		
+			Ejem. Detector de tres 1nos.
+		
+				110111100111110111
+				000001100001110001 
+		
+			TAREA: Implementarlo computacionalmente.
+
+		4- Minimización de estados
+
+			1- Construcción de clases de equivalencia de E^1 en la colección de Estados.
+			2- Generamos una partición P_1 generada por E^1
+			3- Aplicamos la restricción, que las salidas sean iguales para todo símbolo x que este en I.
+			4- Refinamiento de clases para hallar las clases E^2 de equivalencia (se trabaja al interior de las E^1-clases)
+			5- Recomentación: Tablas ''ambidextra'', con las filas de salida de cada elemento.
+
+				ejemplo de tabla:
+                                x       v(s_2 x)        FS(v(s_2,x))                            x       FS(v(s_5,x))    v(s_5 x)
+                                0       s_5             1       0                <=>            0       1       0       s_2
+                                1       s_2             1       0                <=>            1       1       0       s_5
+
+			- El algoritmo termina cuando la particion que sigue es identica a la anterior, ej: P2 = P3
+
+	
+			Síntesis: s_1 E^K s2 ssi:
+				i) s_1 E^K-1 s_2
+				i)w(v(s_1,p),x) = w(v(s_2,p),x)
+
+		5- Problemas Inversos
+
+		TAREA: Un circuito de 2 entradas y 3 salidas.
+		 Construir un aut?mata para hacer la ingenieria inversa y descubrir que es lo que tiene la 'caja negra'.
+		 Luego, hay que minimizar la cantidad de estados de el aut?mata.
+
+			00	01	10	11	00	01	10	11
+							nos faltan las salidas	
+
+	7- DFA: Autómatas finitos Deterministas
+		De la forma:	A = (Q, ZIGMA, delta, q, F)
+		~ Notar que estos autómatas no poseen funcion de salida. En lugar de W se introduce la colección de estados finales (F).
+
+	8- NFA: Autómatas finitos no-determinísticos	
+		- Los DFA son un caso particular de los NFA
+		- delta ya no será univaluada. Esto trae consecuencias en la definición del lenguajeque acepta el autómata.
+
+		1- Transformación de NFA a DFA
+			1- Pasar de Q al conjunto potencia de Q:	P(Q) == 2^Q
+						delta: QxZIGMA ---> 2^Q al conjunto potencia:
+						^delta:QxZIGMA* ---> 2^Q
+				~ Diremos que el NFA acepta un string w perteneciente ZIGMA* ssi delta(q_0,w) intercepto F != vacio.
+				~ Para formar un DFA a partir del NFA, uno empieza a analizar desde el estado inicial los posibles estados a los que puede llegar cada conjunto de estados al aplicar 0 y 1
+
+	9- E-NFA : Autómatas finitos no determinísticos con transiciones E.
+			
+			w	=	0*	1*	2*	
+
+			0		1		2
+			q_0	-->	q_1	-->	q_2
+				E		E
+
+		1- Clausura-Epsilon
+			T_E*, conceptualmente, es la colección de los pares (p,q) pertenece QxQ tales que se puede transitar donde p hasta q mediante una sucesión finita de transacciones E.
+				T_E^0 = {(p,p) : p pertenece Q} <-- la diagonal de QxQ
+				T_E^1 = T_E^1 
+				T_E^k+1 = {(p,q) pertenece Q^2 : existe r pertenece Q con (p,r) pertenece T_E^k y (r,q) pertenece T_E}
+				T_E*, conceptualmente, es la colección de los pares (p,q) pertenece QxQ tales que se puede transitar donde p hasta q mediante una sucesión finita de transacciones E.
+
+
+	10- Expresiones Regulares
+		r+s	es e.r. que denota	R.S subconjunto de ZIGMA*
+		r s	es e.r que denota	R union S subconjunto de ZIGMA*
+		r*	es e.r que denota	R* pertenece ZIGMA*
+
+		Teorema 1:
+			Sea r una e.r -> existe un NFA-e tal que el L(M) = L(r).
+		Teorema 2:
+			Existe una e.r. ``r'' que denota el mismo lenguaje L.  En otras palabras: L(r) = L(M) = L
+	
+		1- DFA to ER
+			1- Definimos un R^k_ij = Conjunto de todos los caminos en M que van desde el estado q_i hasta el estado q_j, sin visitar un estado q_l con l>k.
+				~ Notar que los caminos incluidos en R^k_ij pueden empezar o terminar en un estado con indice > k.
+			2- Identificamos E.R para cada camino o subconjuntos de R^k_ij
+			3- Hacemos la union de todas esas E.R
+
+
+		Ejemplo: (PREVIEW DEL CERTAMEN)
+
+			Automata con q_0, q_1, q_2. Con ZIGMA = {0,1},
+
+					0	1	0	1
+				q_0	q_1	q_2
+			Final	q_1	q_0	q_2	
+			Final	q_2	q_1	q_1
+
+
+			Problema: Determine una E.R que representa el lenguaje aceptado por este DFA.
+				 En particular, calcule:
+
+					r^1_22
+
+			TAREA:	Salvavidas: Hacer un trabajito original (no mas de 10 paginas) acerca del uso y aplicaciones de las e.r's en UNIX, Linux, en
+					 	computer cience, en por ejemplo: flex, bisonte, ocupen man, grep.
+
+		2- Lema del Bombeo
+			Sea L un leguaje regular dado, L subconjunto de ZIGMA*. Entonces:
+			Existe un n perteneciente a |N, que para todo z perteneciente a L con |z|>n:
+
+					z = uvw,	u,v,w perteneciente a L
+					1 <= |u| < |uv| <= n
+					uv^k w pertenece a L,	k pertenece |N
+
+		3- Estabilidad / Cerradura con respecto a sustituciones
+			- Una sustitución es en realidad una función. 
+			- Esta funcion es definida sobre delta y va a parar al conjunto potencia de los strings.
+			- Notar que f(a) es un lenguaje completo
+
+		4- Homomorfismos
+				Definimos un homomorfismo como una sustitucion,
+				 tal que la función h(a) es un singleton (conjunto que tienen un solo elemento) para todo elemento del lenguaje.
+
+				h:	ZIGMA	--->	nuevo alfabeto
+					 a 	--->	 h(a) = alfa
+
+		5- Homomorfismos Inversos
+			(...)
+
+		TEOREMA: La clase R de los conjuntos regulares es cerrada con respecto a homomorfismos y homomorfismos inversos.
+		TEOREMA: La clase de los conjuntos regulares es cerrada con respecto a cuocientes, donde esta noción se define del siguiente modo:
+				Sean L_1, L_2 lenguajes sobre ZIGMA*; entonces el cuociente de L_1 on respecto a L_2 es el lenguaje:
+					L_1/L_2:= { x pertenece ZIGMA*: Existe un y perteneciente a L_2 tal que xy pertenece a L_1 }
+			Demostración: Basta construir un AF que acepte L_1/L_2 cuando L_1 es regular y L_2 es cualquier lenguaje (no necesariamente regular).
+
+		6- Algoritmos de decisión para conjuntos regulares.
+			Sea M un AF que acepta un lenguaje L, i.e L(M) = L subconjunto de ZIGMA*, supongamos que M tiene _n estados_. Entonces:
+
+			TEOREMA:	1- L  != vacio 		<-->	M acepta un string de largo < n.
+					2- |L| = infinito	<-->	M acepta un string de largo l con n <= l < 2n
+
+		7- Minimización de autómatas: El teorema de Myhill-Nerode
+			1- Contexto: 	ZIGMA*,	ZIGMA alfabeto finito no vacío; consideramos un lenguaje (regular o no),
+				L subconjunto ZIGMA* y un autómata finito M = (Q, ZIGMA, delta, q_0, F).
+				- No necesariamente tendremos que el lenguaje que acepte se cumpla (L(M) no siemrpe es igual a L).
+				- Definiremos dos relaciones de equivalencia en ZIGMA*.
+
+				x,y pertenece a ZIGMA* : 	x R_L y <--> [para todo z perteneciente a ZIGMA*: (xz pertenece a L <--> yz pertenece a L)]
+								x R_M y <--> delta(q_0,x) = delta(q_0,y)
+			(no he visto aplicaciones del mismo, y no lo entiendo mucho)
+
+		8- Como probar que L no es regular:
+			1- Usando el Lema del 'Bombeo
+				1- Suponemos que L es regular.
+				2- Siendo n el número de estados, y z perteneciente a L, |z| >= n. 
+				3- Entonces, LB dice que existen u,v,w tal que:
+
+					- z = uvw	- 1 <= |v| <= |uv| <= n		- u v^kw pertenece a L, para todo k perteneciente a los |N_0
+
+				4- Uno prueba todos los casos posibles haciendo z = uvw, y probando si no se cumple alguna propiedad.
+				5- Una vez probados todos los casos posibles, si uno llega a una contradicción en todas ellas, L no es regular.
+			2- Usando homomorfismos:	( no lo entendí mucho)

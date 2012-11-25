@@ -1,0 +1,90 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc} 		%Codificacion del texto (ISO Latin1 encoding)
+\usepackage{fancyhdr} 			%Permite acomodar a tu gusto la parte de arriba y abajo del documento
+\usepackage[spanish]{babel} 		%Permite definir el idioma del dcumento
+\usepackage{graphicx} 			%Permite exportar imagenes en formato eps
+\usepackage{url} 			%Tipo de fuente para correos y paginas
+\usepackage{pgf}
+\usepackage{fleqn}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{fancyvrb}
+\usepackage{sectsty}
+\usepackage{makeidx}
+\usepackage{colortbl} 			%Permite colocar colores a las tablas
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{moreverb}
+\usepackage[final]{pdfpages}
+%%%%%%%%%%
+%Margenes%
+%%%%%%%%%%
+\parskip 1mm 				%Espacio entre parrafos
+
+%\setlength{\topmargin}{0pt}
+\topmargin      0cm
+\oddsidemargin	0cm  			% Ancho Letter 21,59cm
+\evensidemargin 0.5cm  			% Alto  Letter 27,81cm
+\textwidth	17cm
+\textheight	21.0cm
+\headsep	4 mm
+\parindent	0.5cm
+%%%%%%%%%%%%%%%%%%%%%%
+%Estilo del documento%
+%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancyplain}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fancyheadings. Top y Bottom del documento%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\lhead{Computación Científica II} 			%Parte superior izquierda
+\rhead{\bf \it }		 	%Parte superior derecha
+\lfoot{\it GZ/RF/CM/2009} 				%Parte inferior izquierda.
+\cfoot{} 						%Parte inferior central
+\rfoot{\bf \thepage} 					%Parte inferior derecha
+\renewcommand{\footrulewidth}{0.4pt} 			%Linea de separacion inferior
+%\makeindex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% Aqui empieza el documento %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\bibliographystyle{plain}
+\include{src/portada}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+\input{src/1-introduccion}
+\newpage
+
+\section{Desarrollo}
+\input{src/2-funciones}
+\newpage
+\input{src/3-integralesDefinidas}
+\newpage
+\input{src/4-funcionesEspecialesIntegral}
+\newpage
+\input{src/5-otrasAplicaciones}
+\newpage
+
+\section{Conclusiones}
+\input{src/6-conclusiones}
+\newpage
+
+\section{Glosario}
+\input{src/7-glosario}
+\newpage
+
+%\section{Anexos}
+%\input{src/8-anexos}
+%\newpage
+
+\bibliography{informe}
+
+\end{document}

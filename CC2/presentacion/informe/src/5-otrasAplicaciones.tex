@@ -1,0 +1,73 @@
+\subsection{Otras aplicaciones}
+
+Las aplicaciones anteriores están destinadas a ser meramente ilustrativos, de poder resolver
+el problema de una rutina de propósito general, para la solución de ecuaciones simultáneas
+diferenciales ordinarias de primer orden. Ellos fueron seleccionados debido,
+en parte, a que estaban entre los más evidentes de estas aplicaciones. Algunas
+aplicaciones adicionales son las que nombraremos a continuación,
+a modo de ejemplo, para indicar el mayor ámbito de aplicación de este enfoque general.
+Existe cierta coincidencia en la lista, pero se cree mejor ser un poco
+redundante a que, posiblemente, se le reste importancia a algunos temas.
+
+\begin{enumerate}
+	\item Múltiples integrales definidas\\
+		Es evidente que los métodos de la sección 3 se puede generalizar para el
+		tratamiento de las integrales múltiples. Las ventajas se multiplican en este caso,
+		como se indica allí.
+
+	\item Ecuaciones diferenciales derivadas en términos de un parámetro del
+problema.\\
+		En muchos casos, de decir, el rito esencial, es posible derivar una ecuación diferencial
+		en función de un parámetro del problema y, posteriormente, resolver esta ecuación
+		diferencial numéricamente (o, en casos excepcionales analíticamente!).
+		Esto normalmente elimina toda una dimensión del problema.
+		El ejemplo de la sección 2 es un ejemplo de esta técnica.		
+
+	\item Ceros en funciones no-lineales (root-tracing) \\
+		Una aplicación interesante de la técnica anterior se produce en la determinación de los loci
+		de ceros de funciones no lineales.
+		La información detallada en relación con este tema está disponible en $ [1] $.
+
+	\item Equipotenciales, isotérmicos, campos lineales, etc.\\
+		Las ecuaciones diferenciales de las curvas de los valores de la
+		función constante pueden ser determinadas a través de la raíz de
+		trazado de la técnica. Similares ecuaciones diferenciales
+		para las trayectorias ortogonales también se obtiene fácilmente.
+
+	\item  Derivadas dadas implícitamente en ecuaciones diferenciales
+ordinarias.\\
+		Las rutinas de propósito general están diseñados para resolver ecuaciones de la forma (1) con las
+		expresiones derivadas dado de forma explícita. Si esto es imposible de alcanzar en una aplicación
+		dada, por lo general hay alternativas. Las derivadas pueden ser la solución de un sistema lineal
+		de ecuaciones algebraicas. En general, no se debe intentar producir las soluciones explícitas,
+		sino más bien, el sistema lineal debe ser resuelto numéricamente en cada paso de integración.
+		Si el derivado se da implícitamente en forma no lineal $G(x,y,y') = 0$, la técnica de trazado
+		de la raíz puede ser utilizado para producir una solución en línea de la ecuación no lineal.
+
+	\item Integrales oscilatorios.\\
+		Graves dificultades de computación se producen cuando el integrando de una integral es muy oscilante.
+		En algunos casos, es imposible obtener resultados significativos en todos los de una integración directa.
+		Una técnica eficaz para el alivio de esta dificultad es deformar el camino de la integración en el plano
+		complejo. Lo que se desea es el camino de integración de arte que a lo largo de la fase de la función
+		integrando es constante. La raíz de la técnica de rastreo permite la determinación simultánea de la ruta
+		adecuada de la integración, junto con la integración en sí, ver $[2]$.
+
+	\item Problemas del valor de dos puntos de la frontera.\\
+		Dos problemas de límite de valor de punto se suelen resolverse a través de la solución iterativa de
+		problemas de valor inicial. Algunas técnicas que giran alrededor de la solución simultánea de las ecuaciones
+		diferenciales relacionadas con acelerar el proceso de convergencia, véase $[3]$. Más significativamente,
+		a veces es posible reducir el problema a un problema de valor inicial en un parámetro del problema, ver $[4]$.
+
+	\item Ecuaciones diferenciales parciales parabólicas y hiperbólicas.\\
+		En la ``marcha de tipo'' problemas de ecuaciones diferenciales parciales a menudo es conveniente para
+		discretizar una o más (por lo general el espacio), pero las variables de mecanización de la marcha variable
+		(normalmente el tiempo) a través de una rutina de propósito general para la solución de ecuaciones diferenciales
+		ordinarias simultáneas. Se obtiene un número de sistemas de ecuaciones diferenciales ordinarias igual al número
+		de puntos de malla en las variables de espacio.
+
+	\item Ecuaciones Integrales.\\
+		Muchos de los problemas expresados en términos de las ecuaciones integrales tienen representaciones equivalentes
+		en términos de ecuaciones diferenciales. Esta última forma es a menudo superior desde un punto de vista de la
+		informática.
+
+\end{enumerate}

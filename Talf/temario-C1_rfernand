@@ -1,0 +1,30 @@
+TEMARIO CERTAMEN 1 TALF
+
+	1- Logica: p => q	p,q son proposiciones (Aristoteles)
+        2- Teoría aximatica de conjuntos
+	3- Inducción
+	4- Relaciones de equivalencia:
+		1- Clases de R-Equivalencia
+	5- Conjuntos Numerables
+	6- Automatas
+		1- Definicion recursiva de los Zigma^i:
+		2- La Clausura de Kleene de Zigma:
+		3- Clausura de relaciones sobre conjuntos
+		4- Minimización de estados
+		5- Problemas Inversos
+	7- DFA: Autómatas finitos Deterministas
+	8- NFA: Autómatas finitos no-determinísticos	
+		1- Transformación de NFA a DFA
+	9- E-NFA : Autómatas finitos no determinísticos con transiciones E.
+		1- Clausura-Epsilon
+	10- Expresiones Regulares
+		1- DFA to ER
+		2- Lema del Bombeo
+		3- Estabilidad / Cerradura con respecto a sustituciones
+		4- Homomorfismos
+		5- Homomorfismos Inversos
+		6- Algoritmos de decisión para conjuntos regulares.
+		7- Minimización de autómatas: El teorema de Myhill-Nerode
+		8- Como probar que L no es regular:
+			1- Usando el Lema del 'Bombeo
+			2- Usando homomorfismos

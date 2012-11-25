@@ -1,0 +1,49 @@
+Tomemos un vector $w$, tal que $w={u \brack v}$ .\\
+Consideremos tambien que $t$ es fijo.\\
+(Teniendo en cuenta que para el caso anterior se tomaba $t$ como una variable que tenia su valor denotado por $t_{n+1} = t_{n} +  h,\ con\ h > 0, n \in \mathbb{N}$)
+
+Como anteriormente definimos nuestra función $\Phi$ (en la explicación del método de Newton), podemos decir que:
+
+\begin{eqnarray}
+\Phi (w_{1}) - \Phi (w_{2}) &=& \Phi ({u_{1}\brack v_{1}}) - \Phi ({u_{2}\brack v_{2}}) \nonumber \\
+  &=& \frac{h}{3} { v_{1} - v_{2} \brack \alpha(u_{2}^{3} - u_{1}^{3}) + \beta(u_{2} - u_{1}) + \delta(v_{2} - v_{1})}
+\end{eqnarray}
+
+Por lo tanto, ahora basándonos en el teorema de lipschitz
+podemos decir que:
+$$\parallel w \parallel_{2} \leq K \leq \infty$$
+Teniendo en cuenta que solo aplicamos la norma 2 a nuestro vector $w$
+y lo comparamos con la constante de \emph{lipschitz} para que cumpla la \emph{continuidad de lipschitz}.
+Entonces tenemos que:
+
+\begin{eqnarray}
+(v_{1}-v_{2})^{2} \leq (u_{1} - u_{2})^{2} + (v_{1} - v_{2})^{2} &=& \parallel  w_{1} - w_{2} \parallel_{2}^{2}
+\end{eqnarray}
+
+Tomando en cuenta ahora el desarrollo de la diferencia $\Phi(w_{1}) - \Phi(w_{2})$.
+
+$$(\alpha\left[ u_{2}^{3} - u_{1}^{3}\right] + \beta\left[ u_{2} - u_{1}\right] + \delta \left[ v_{2} v_{2}\right])^{2}  = $$
+$$(\alpha \left[ u_{2} - u_{1}\right]\left[ u_{2}^{2} + u_{2} u_{1} + u_{1}^{2}\right] + \beta \left[u_{2}-u_{1}\right] + \delta \left[v_{2} - v_{1}\right])^{2} \leq $$
+$$(|\alpha | \parallel w_{1} - w_{2}\parallel_{2} 3 K^{2} + |\beta| \parallel w_{1} - w_{2} \parallel_{2} + |\delta |\parallel w_{1} - w_{2} \parallel_{2})^{2} = $$
+$$(3|\alpha |K^{2} +|\beta|+|\delta|)^{2} \parallel w_{1} - w_{2} \parallel_{2}^{}$$
+
+Luego tenemos que:
+
+\begin{eqnarray}
+\parallel \Phi (w_{1}) - \Phi (w_{2}) \parallel \leq \frac{h}{3} \sqrt{1+(3|\alpha | K^{2} + |\beta |+|\delta|)^{2}} \parallel w_{1} - w_{2}\parallel_{2} \nonumber
+\end{eqnarray}
+
+Por lo cual si elegimos un $h > 0$ pero que sea lo suficientemente pequeño, tal que, por ejemplo:
+
+\begin{eqnarray}
+L := \frac{h}{3} \sqrt{1+(3|\alpha | K^{2} + |\beta |+|\delta|)^{2}} < \frac{1}{2} \nonumber
+\end{eqnarray}
+
+Por lo tanto nuestra función $\Phi$ satisface una \emph{condición de Lipschitz} con $L < \frac{1}{2}$.
+Tiene entonces un completo sentido poder reemplazar el mecanismo anteriormente utilizado de las \emph{iteraciones de Newton} por las
+\emph{iteraciones de Lipschitz}.
+
+Nos tomamos la libertad de decir \emph{``sí, podemos reemplazar el método''}, porque sabemos que cumpliéndose la condición de Lipschitz
+estamos demostrando la existencia y la unicidad de una solución en la ecuacion diferencial ordinaria en la que estamos trabajando.
+
+

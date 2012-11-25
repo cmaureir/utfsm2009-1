@@ -1,0 +1,206 @@
+\documentclass[letter, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[dvips]{graphicx}
+\usepackage{url}
+\usepackage[top=3cm,bottom=3cm,left=3.5cm,right=3.5cm,footskip=1.5cm,headheight=1.5cm,headsep=.5cm,textheight=3cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+
+\begin{document}
+\title{Computación Científica II\\ \begin{Large} Laboratorio \#1: Oscilador de
+Duffing \end{Large}}
+\author{
+Rodrigo Fernández \\ 2673002-3 \\ \texttt{rfernand@inf.utfsm.cl} \and
+Cristián Maureira \\ 2673030-9 \\ \texttt{cmaureir@inf.utfsm.cl} \and
+Gabriel Zamora \\ 2673070-8 \\ \texttt{gzamora@inf.utfsm.cl} \and
+Juan Pablo Cares \\ 2673066-K \\ \texttt{jcares@alumnos.inf.utfsm.cl} \and
+Luiz Pizarro \\ 2673056-2 \\ \texttt{lupizarr@alumnos.inf.utfsm.cl} \and
+Nicolas Ceroni \\ 2673028-7 \\ \texttt{nceroni@alumnos.inf.utfsm.cl}
+}
+
+\date{\today}
+\maketitle
+
+\section{Oscilador de Duffing}
+El oscilador de Duffing es un ejemplo de un oscilador con excitación periódica y con un término no lineal de elasticidad, que viene dado por:
+
+$$
+	\ddot{x} + \delta \dot{x} + \beta x+ \alpha x^3 = \gamma \cos \omega dt
+$$
+\begin{itemize}
+	\item Escriba la ecuación de Duffing en la forma $y = F (t, y)$.\\
+	\textbf{Respuesta:}\\
+
+	Sea  
+	$$y_1 = x,$$
+	$$y_2 = \dot{x}$$
+	tenemos que 
+	\begin{eqnarray}
+	\dot{y_1} & = & \dot{x} \nonumber \\
+	& = & y_2 \nonumber \\ \nonumber \\
+	\dot{y_2} & = & \ddot{x} \nonumber \\
+	& = & \gamma cos \omega t - \delta \dot{x} - \beta x - \alpha x^3 \nonumber \\
+	& = & \gamma cos \omega t - \delta y_2 - \beta y_1 - \alpha {y_1}^3 \nonumber \\
+	\nonumber
+	\end{eqnarray}
+
+Logrando así que:\\
+$$
+	\dot{y} = \begin{bmatrix} \dot{y_1} \\ \dot{y_2} \end{bmatrix} = \begin{bmatrix} y_2 \\ \gamma cos \omega t - \delta y_2 - \beta y_1 - \alpha {y_1}^3 \end{bmatrix} = \begin{bmatrix} F_1(t, y_1, y_2) \\ F_2(t, y_1, y_2) \end{bmatrix} = F(t,y) \nonumber
+$$
+
+además de que 
+\begin{eqnarray}
+	F_1(t, y_1, y_2) &=& y_2 \nonumber \\
+	F_2(t, y_1, y_2) &=& \gamma cos \omega t - \delta \dot{y_1} - \beta y_1 - \alpha {y_1}^3 \nonumber \\
+	y_1(t_0) &=& x(t_0) \nonumber \\
+	y_2(t_0) &=& \dot{x}(t_0) \nonumber 
+\end{eqnarray}
+
+	\item Transforme el problema anterior en una ecuación integral de la forma:
+$$
+	y(t_n +1) = y(t_n - 1) + \int_{t_n-1}^{t_n+1} F(t, t(y))dt
+$$
+Escribiendo $y(t_k ) = y_k$ la ecuación queda:
+$$
+	y_{n+1} = y_{n-1} + \int_{t_n - 1}^{t_n +1} F(t,t(y))dt
+$$
+\end{itemize}
+
+Aplicando la regla de Simpson para calcular la integral que aparece en
+la ecuación integral, se obtiene la ecuación de recurrencias:
+
+$$
+y_{n+1} = y_{n-1} + \frac{h}{3} [F (t_{n-1} , y_{n-1} ) + F (t_n , y_n ) + F
+(t_{n+1} , y_{n+1} )]
+$$
+
+\subsection{Programa con iteraciones de Newton para calcular $y_{n+1}$}
+Antes de llegar y aplicar el programa, debemos hacer algunas aclaraciones y calculos antes:
+La ecuación (4) define $y_{n+1}$ implícitamente en términos de $y_n$ ,
+$y_{n-1}$. Notando que todas las expresiones y términos distintos de $y_{n+1}$
+en (4) son conocidos, esta ecuación se reduce a una ecuación de la forma:
+$$
+y_{n+1}= \Phi(y_{n+1})
+$$
+En términos de sus componentes la ecuación (5) viene dada por:
+
+$$
+\Phi_1(u,v) = y_{n-1}^1+\frac{h}{3}(y_{n-1}^2+4y_{n}^2+v),
+$$
+$$
+ \Phi_2(u,v) = y_{n-1}^2+\frac{h}{3}(\alpha [(y_{n-1}^1)^3+4(y_{n}^1)^3+u^3]+ \beta[y_{n-1}^1+4y_{n}^1+u]+\\ \delta[y_{n-1}^2+4y_{n}^2+v]-2 \gamma(2+cos(wh))cos(wt))
+$$
+\\\\
+El problema consiste, entonces, en determinar un punto fijo $y_{n+1}$ de la función conocida $\Phi$, lo que en este ejercicio se propone hacerlo mediante iteraciones de Newton. Sean $u$, $v$, respectivamente, la primera y la segunda componente del vector incógnito $y_{n+1}$ y $\Phi_1$, $\Phi_2$ las funciones componentes de la función vectorial $\Phi$. Entonces (5) es equivalente al sistema de ecuaciones:
+
+$$
+\begin{Bmatrix} u=\phi_1(u,v) \\v=\phi_2(u,v) \end{Bmatrix}
+$$
+
+Queremos proceder por entera analogía al método de Newton unidimensional. Para ello escribiremos las ecuaciones (7) en la forma:
+
+$$
+z=z_1(u,v)=u- \phi_1(u,v),        z=z_2(u,v)=v- \phi_2(u,v)
+$$
+
+
+que representan dos superficies $S_1$ , $S_2$ en el espacio $\mathbb{R}^3$ . Las ecuaciones (7) corresponden a las curvas de nivel $\Gamma_1$, $\Gamma_2$, de nivel $z = 0$, de las superficies $S_1$, $S_2$ definidas por (7), esto es, $\Gamma_1$, $\Gamma_2$ son las curvas de intersección de las superficies $S_1$, $S_2$ con el plano coordenado $uv$ del espacio $\mathbb{R}^3$.
+
+El problema consiste, entonces, en determinar el punto $(u^*, v^*)$ del
+plano coordenado $uv$ donde las curvas $\Gamma_1$, $\Gamma_2$ se intersectan.
+Con este propósito generaremos, mediante el método de Newton, una sucesión de
+puntos $\{(u_\nu v_\nu )\}_{\nu \in{\mathbb{N}_0}}$ que se aproximan a $(u^*,
+v^*)$ para $\nu\rightarrow{\infty}$.
+Iniciamos las iteraciones de Newton con una aproximación $(u_0 ,v_0)$ de $(u^*, v^*)$, dada por:
+
+$$
+(u_0,v_0) := (y_n^1,y_n^2)
+$$
+
+Supongamos que ya hemos computado la aproximación $(u_\nu, v_\nu)$ de $(u^*,v^*)$. Si $z_1(u_\nu, v_\nu) = z_2 (u_\nu, v_\nu ) = 0$, o bien, en téminos computacionales, si:
+
+$$
+\left |{z_1(u_ \nu,v_\nu)}\right |< \varepsilon , \left |{z_2(u_ \nu,v_\nu)}\right |< \varepsilon 
+$$
+
+donde $0 < \epsilon << 1$ es un valor prescrito, entonces las iteraciones de Newton terminan y ponemos:
+
+$$
+y_{n+1}^1:=u_ \nu   ,  y_{n+1}^2:=v_ \nu
+$$
+
+Si, por el contrario, $z_1(u_\nu, v_\nu ) > \epsilon$, o bien $z_2(u_\nu , v_\nu ) > \epsilon$, entonces tenemos que continuar iterando con respecto a $\nu$. Para esos valores $u_\nu$ y $v_\nu$, se tiene:
+
+$$
+ z_1(u_ \nu,v_ \nu) = u_ \nu -  \phi_1(u_ \nu,v_ \nu) , z_2(u_ \nu,v_ \nu) = u_ \nu -  \phi_2(u_ \nu,v_ \nu)
+$$
+
+Razonando por analogía puesto que en el caso unidimensional de las iteraciones de Newton se considera la recta tangente a la curva $y = f (x)$ en el punto $x_k, f(x_k)$ y se determina el punto en que esa recta corta al eje x, en el caso bidimensional habrá que considerar los planos tangentes a las superficies $S_j : z = z_j(u,v)$ en los puntos $ u_\nu , v_\nu , z_j (u_\nu, v_\nu)\in{\mathbb{R}^3}$, para luego determinar las rectas $L_j$ de intersecció de estos planos con el plano $uv$. Si estas rectas no son paralelas, su punto de intersección determina los siguientes valores $(u_{\nu+1}, u_{\nu+1})$ para las iteraciones de Newton. Como se sabe, la ecuación de los planos tangentes aludidos vienen dadas por:
+
+$$z-z_1(u_\nu,v_\nu) = \frac{{\partial z_1}}{{\partial u}}(u_\nu,v_\nu)(u-u_\nu)+\frac{{\partial z_1}}{{\partial v}}(u_\nu,v_\nu)(v-v_\nu)$$
+$$z-z_2(u_\nu,v_\nu) = \frac{{\partial z_2}}{{\partial u}}(u_\nu,v_\nu)(u-u_\nu)+\frac{{\partial z_2}}{{\partial v}}(u_\nu,v_\nu)(v-v_\nu)$$
+
+esto es, por:
+$$
+z-z_1(u_\nu,v_\nu) = (1-\frac{{\partial \phi_1}}{{\partial u}}(u_\nu,v_\nu))(u-u_\nu)+\frac{{\partial \phi_1}}{{\partial v}}(u_\nu,v_\nu)(v-v_\nu)
+$$
+
+$$
+z-z_2(u_\nu,v_\nu) = -\frac{{\partial \phi_2}}{{\partial u}}(u_\nu,v_\nu)(u-u_\nu)+(1+\frac{{\partial \phi_2}}{{\partial v}})(u_\nu,v_\nu)(v-v_\nu)
+$$
+
+Las ecuaciones de las rectas $L_1$ y $L_2$ se obtienen haciendo $z = 0$ en las ecuaciones precedentes.
+El sistema de ecuaciones resultantes se escribe en forma matricial como:
+
+$$
+\begin{bmatrix}{1-\frac{{\partial \phi_1 }}{{\partial u}}(u_ \nu,v_ \nu)
+}&{-\frac{{\partial \phi_1 }}{{\partial v}}(u_ \nu,v_ \nu)}\\{-\frac{{\partial
+\phi_2 }}{{\partial u}}(u_ \nu,v_ \nu)}&{1-\frac{{\partial \phi_2 }}{{\partial
+v}}(u_ \nu,v_ \nu)}\end{bmatrix}\begin{bmatrix}{u-u_ \nu}\\{v-v_
+\nu}\end{bmatrix}=\begin{bmatrix}{-z_1(u_ \nu,v_ \nu)}\\{-z_2(u_ \nu,v_
+\nu)}\end{bmatrix}
+$$
+\\\\
+La solución del sistema (15) para $u$, $v$ da la siguiente aproximación $(u_{\nu+1}, v_{\nu+1})$ de $(u^*, v^*)$:
+
+$$
+\begin{bmatrix}{u_{ \nu+1}}\\{v_{ \nu+1}}\end{bmatrix}=\begin{bmatrix}{u_
+\nu}\\{v_ \nu}\end{bmatrix}+\begin{bmatrix}{1-\frac{{\partial \phi_1
+}}{{\partial u}}(u_ \nu,v_ \nu)     }&{-\frac{{\partial \phi_1 }}{{\partial
+v}}(u_ \nu,v_ \nu)}\\{-\frac{{\partial \phi_2 }}{{\partial u}}(u_ \nu,v_
+\nu)}&{1-\frac{{\partial \phi_2 }}{{\partial v}}(u_ \nu,v_
+\nu)}\end{bmatrix}^{-1} \begin{bmatrix}{-z_1(u_ \nu,v_ \nu)}\\{-z_2(u_ \nu,v_
+\nu)}\end{bmatrix}
+$$
+
+\lstset{basicstyle=\footnotesize, breaklines=true, numbers=left,
+frame=shadowbox, rulesepcolor=\color{black}}
+\lstinputlisting{src/newton2.m}
+
+\subsection{Iteraciones de Lipschitz}
+\subsubsection{Estudio de la posibilidad de obtener $y_{n+1}$ con iteraciones de Lipschitz}
+\input{src/2-estudio}
+\subsubsection{Algoritmo para obtener $y_{n+1}$ con iteraciones de Lipschitz (en
+matlab u Octave)}
+\lstset{basicstyle=\footnotesize, breaklines=true, numbers=left,
+frame=shadowbox, rulesepcolor=\color{black}}
+\lstinputlisting{src/lipschitz.m}
+
+\section{Análisis de los algoritmos}
+\subsection{Descripción del algoritmo 1 (Newton)}
+\input{src/3-alg1}
+\subsection{Descripción del algoritmo 2 (Lipschitz)}
+\input{src/4-alg2}
+\subsection{Resultados de los algoritmos}
+\input{src/5-resultados}
+\subsection{Comparativas}
+\input{src/6-comparativas}
+\subsection{Conclusiones}
+\input{src/7-conclusiones}
+
+
+\end{document}

@@ -1,0 +1,117 @@
+CAPITULO 3 - Transmision de Frames
+
+* ¿Por que es necesario agrupar los bits en frames?
+   -Manejo y control de errores
+   -multiplexion de lineas
+* El adaptador de red determina donde comienza y termina el frame
+* Se ocupan frames en enlaces punto a punto, redes acceso multiple (CSMA/CD y Token Ring)
+
+2) Protocolos Orientados al Byte
+
+* Conectar terminales a mainframes (Antiguedad)
+   -BISYNC (IBM 1960)
+	-Character Stuffing; solucion por si aparece el byte ETX
+   -IMP-IMP (ARPANET)
+   -DDCMP
+
+3) Protocolos Orientados al BIT (HDLC)
+   -SDLC: IBM (Synchronous Data Link Control)
+   -HDLC: OSI
+	-cada cinco segundos se introduce un cero
+   -PPP: Point to Point Protocol (Muy similar a HDLC)
+
+4) Deteccion de Errores
+
+* Tipos
+   -de Rafaga (raros en las redes modernas)
+	-Cobre: 1 bit errado en 10^7 bits
+	-F. opt: 1 bit errado en 10^14 bits
+   -de Paquetes
+	-un pkg perdido totalmente(por bit o switch; sin suficiente memoria)
+   -de Enlaces
+	-se corta el link o el pc se cae.
+
+* Tecnicas de deteccion de errores (d=1,2,3)
+   -paridad de 2 dimensiones (para dar d=3, se usa hamming)
+   -Cheksum
+	-lo usa el protocolo IP
+	-sumar todas las palabras que se trasmiten y mandar el resultado de la suma
+	-suma en complemento 1
+	-no tiene prop tan fuertes de correccion
+	-facil de implementar por sw
+   -CRC (Codigo Redundancia Ciclica)
+	-usado en todas las LAN
+
+5) Transmision confiable de frames
+
+* Frames
+   -Se pueden corromper
+   -Protocolo de Enlace de datos debe ser capaz de recuperarlos
+   -Dos mecanismos
+	-ACK: frame de control, sin datos!
+	-Timeouts: accion de esperar un tiempo razonable
+   -Si el transmisor no recibe ACK despues de un tiempo razonable, se retransmite el frame original
+
+* Protocolo ARQ (Automatic Repeat Request)
+   -Se le denomina a Ocupar ACK y timeouts
+   -dentro de los protocolos ARQ estan:
+	-Stop & Waits
+	   -Diagrama con los frames y ACK
+	   -Escenarios Posibles
+		-Se pierde el frame original
+		-Se pierde el ACK (se genera un frame duplicado)
+		-El timeout esta mal regulado
+	   -Problemas:
+		-Permite un solo frame en el link -> baja utilizacion del BW
+		-Generacion de frames duplicados
+		   -Sol: incorporar en el header un numero de sec de bits (alternados)
+	   -Ejercicio: EFICIENCIA
+		Link de 1.5Mbps con RTT = 45 mseg
+		Retardo x BW = 67.5Kb = 8 KB
+		Cada frame tiene un tamaño promedio 1KB
+		Velocidad Efectiva Trasmisor = 1024x8 / 0.045 = 182 Kbps
+		Capacidad Link / Capacidad Usada  = 1.5x10^6 / 182 x 10^3 = 8.24
+
+	   -Eficiencia:
+		-Se usa 1/8 de la cap del link
+		-Para usar completamente el link, es necesario transmitir 8 frames antes de esperar el ACK
+		-Principio simple: "Mantener la tuberia llena"
+		-Se logra con las ventanas deslizantes
+	-Ventanas Deslizantes
+	   -Escenario:
+		-Retardo x BW = 8 KB
+		-Frames de 1 KB
+		-El transmisor podria transmitir el 9no frame cuando llega el ACK
+	   -Algoritmo:
+		-Transmisor:
+		   -Se asigna un numero de secuencia a cada frame (NumSec)
+		   -Se mantienen 3 variables:
+			TVT: Tamaño ventana transmisor (nro max de frames que el transmisor puede transmitir)
+			URR:Nro de secuencia que indica el Ultimo Reconocimiento Recibido
+			UFT:Nro de secuencia del Ultimo Frame Transmitido
+		
+			UFT - URR <= TVT
+
+		   -Acciones:
+			-Cuando llega un ACK el transmisor mueve URR a la derecha permitiendo transmitir un nuevo frame
+			-Asocia un time a cada frame. En la ventana de transmision se mantienen los frames transmitidos en un buffer a la espera de reconocimiento.
+		-Receptor:
+		   -mantiene 3 variables:
+			TVR: Tamaño Ventana Receptor (mantiene la cota max de frames fuera de orden que se espera recibir)
+			UFA: Numero de secuencia del Ultimo Frame Aceptable
+			SFE: Numero de secuencia del Siguiente Frame Esperado
+
+			UFA - SFE + 1 <= TVR
+
+		   -Algoritmo:
+			-Al llegar un frame, el receptor toma la sgte accion:
+			   if(NumSec < SFE || NumSec > UFA)
+				El frame se descarta por estar fuera de la ventana
+			   if(SFE <= NumSec <= UFA)
+				Se acepta
+
+
+	   -Numeros de Secuencia Finitos
+		-¿Cuantos numeros se necesitan?
+			TVT < (Total de nros de secuencia disponibles +1)/2
+	   -El protocolo de ventana deslizante, alterna entre las dos mitades del espacio de numeros de secuencia

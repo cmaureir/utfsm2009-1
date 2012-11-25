@@ -1,0 +1,82 @@
+\subsection{Integrales definidas}
+En el presente trabajo, se toma como un nuevo ejemplo, una integral general definida de la forma:
+
+\begin{eqnarray}
+	I &=& \int_{a}^{b} f(t) dt
+\end{eqnarray}
+
+El enfoque estándar para realizar esta evaluación sería seleccionar primero una \emph{fórmula de cuadratura},
+pero ¿Qué son las fórmulas de cuadraturas?.
+
+Sea $f(x)$ una función continua definida en el intervalo $[a, b]$.
+Nuestro objetivo será encontrar fórmulas aproximadas para calcular la integral $\int_{a}^{b}f(x) dx$.
+En caso de conocer la primitiva $F(x)$ es evidente que podemos encontrar el valor exacto de la integral
+utilizando el Teorema fundamental del cálculo integral: $\int_{a}^{b}f(x) dx = F(b) - F(a)$.
+Sin embargo no siempre ésto es posible.
+
+Por ejemplo, para la funcion $f(x) = e^{-x^{2}}$
+no existe ninguna primitiva que podamos escribir utilizando funciones elementales.
+
+Algunas fórmulas de cuadraturas son:
+\begin{itemize}
+	\item Fórmulas de los rectángulos.
+	\item Fórmulas de  los trapecios.
+	\item Método de Simpson.
+	\item etc.
+\end{itemize}
+
+Volviendo a nuestro tema principal, el tipo de solución es normalmente realizado sobre la base de que conocemos
+la primitiva, lo cual presenta una  facilidad de programación.
+Entonces, se deben definir una malla adecuada de puntos para aplicar la fórmula de cuadratura.
+El intervalo de malla seleccionado es casi siempre uniforme y acotado.
+
+La principal dificultad asociada con este enfoque es, la determinación de un intervalo apropiado de integración.
+Los límites de error habituales involucran las mayores derivadas de la función del integrando, $f(t)$.
+Esta función suele ser tan complicada que un análisis de, por ejemplo, la quinta derivada es totalmente impracticable o,
+por decir lo menos, poco economica.
+Por la misma razón, es generalmente imposible especificar un intervalo variable de integración para aprovechar las
+características variables de $f(t)$ sobre el intervalo de integración.
+
+El método común para superar estas dificultades,
+es llevar a cabo la integración dos veces con el doble del número de puntos en la segunda integración.
+Luego, la precisión se puede afirmar, según el acuerdo de los dos resultados.
+Una desventaja de este procedimiento es que un mínimo de tres veces más evaluaciones del integrando,
+son necesarias como habría sido necesario un conocimiento a priori.
+La necesidad práctica de utilizar una malla uniforme normalmente puede introducir un factor adicional de tres o cuatro.
+Así que las evaluaciones más un orden de magnitud de la integral que se realizan son básicamente necesarias.
+Este es un factor que no puede ser ignorado incluso en los computadores de hoy en día de alta velocidad.
+Cabe señalar que en el caso de las integrales múltiples de orden N, esto se convierte en N órdenes de magnitud.
+
+Un enfoque ``preferido'' es la de formar una ecuación diferencial mediante la definición de
+
+\begin{eqnarray}
+	I(x) = \int_{a}^{x} f(t) dt
+\end{eqnarray}
+y diferenciando
+\begin{eqnarray}
+	\frac{dI}{dx} = f(x),
+\end{eqnarray}
+con
+\begin{eqnarray}
+	I(a) = 0
+\end{eqnarray}
+entonces
+\begin{eqnarray}
+	I(b) = I
+\end{eqnarray}
+
+que sería igual que $(1)$, proporcionando el resultado deseado.
+Debido a la naturaleza especial de la función derivada (sólo depende de x),
+sólo una evaluación de la función es necesaria por paso, en lugar de dos para las derivadas de las funciones más general.
+Una buena rutina de propósito general para las ecuaciones diferenciales contendrá los medios para tomar ventaja de este hecho.
+
+Las ventajas de este enfoque es que la rutina de seguimiento continuo monitorea la presición de la integración y
+aumenta el intervalo de integración, cuando sea posible.
+Una malla variable apropiada es construida en línea con sólo una evaluación del integrando por cada paso,
+mientras que la precisión adecuada se mantiene.
+Un orden de magnitud en el tiempo de cálculo se obtiene de las integrales individuales;
+dos órdenes de magnitud para las integrales dobles.
+
+Este enfoque se pueden programar fácilmente y depurado.
+Una vez más, una buena rutina de propósito general contiene los medios para asegurar que el punto final
+(x = b) estará en la malla variable construida por la rutina.

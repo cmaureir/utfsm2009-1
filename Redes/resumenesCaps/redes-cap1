@@ -1,0 +1,113 @@
+-----
+Cap1
+-----
+
+3 CONECTIVIDAD
+
+Links
+	-Punto a punto
+	-Acceso multiple (tienen limitaciones de escalabilidad)
+Redes conexion indirecta
+	-redes de packet switching
+	-las unidades de informacion que se transmiten por aca -> paquetes
+	-utilizan tecnica de Store and Forward
+	-un switch guarda paquetes y los despacha
+Internetwork
+	-cjto de redes distintas interconectadas
+
+Otro requerimiento de las redes (soporte para...)
+	-Unicast: envio de un msj de un host a otro host en la red
+	-Multicast: envio de un msj de un host a un grupo de host de la red
+	-Broadcast: envio de un msj de un host a todos los host de la red
+
+Tamaños:
+	-LAN (Local Area Network)
+		-Redes con menos de 1km de extension
+	-WAN (Wide Area Network)
+		-Cobertura planetaria
+	-MAN (Metropolitan Area Network)
+		-app 10km (universidades)
+	-SAN (System Area Network)
+		-Habitacion donde se conectan varios componentes
+	-DAN (Desk Area Network)
+		-se reemplaza el bus E/S por una red
+Recursos Compartidos: (MUX DEMUX)
+	-packet switching
+	
+4 CANALES ABSTRACTOS
+	-hay varias aplicaciones en las redes
+	-cada tipo de app define un canal abstracto
+	-estos canales se manejan por 2 protocoloes
+	-Request/Reply (RRP)
+		-mensajes de consultas cortos y respuestas grandes
+		-no se aceptan perdidades de paquetes
+		-busca proteger privacidad e integridad
+		-ej: ftp, www, bibliotecas digitales
+	-Message Stream (MSP)
+		-trafico HDX o FDX con retardos controlados
+		-no es necesario que todos los mensajes sean recibidos
+		-garantizar el orden!
+		-Video on demand, NV, teleconferencias
+
+5 ARQUITECTURA DE REDES
+	-necesidad de definirlas -> sitemas complejos
+	-capas
+	-las capas se comunican ocupando un protocolo
+	-protocolos
+		-objetos abstractos que se ocupan para construit capas
+		-provee servicio comunicacion
+		-define 2 interfaces distintas
+			-Service interface:
+				-en el mismo pc, define operaciones posibles
+			-Peer interface:
+				-define forma y sentido de los msjs
+
+6 ARQUITECTURA OSI
+	-"no es un grafo de protocolos, sino una guia para diseñarlos"
+	-capa fisica:
+		-transmitir bits sin estructura sobre un enlace de comuniacion
+		-resuelve: tamaño y forma de conectores, covierte bits en señales electronicas
+		-pueden haber varias capas fisicas
+	-enlace de datos:
+		-transmitir pedazos de info a traves de un enlace
+		-resuelve:deteccion de corrupcion de datos
+		-coordina uso de medios fisicos compartidos
+		-comun que, dif enlaces de datos impl dif capas enlace datos
+	-red:
+		-permite comunicacion de par de hosts	
+		-responsable de encontrar el camino
+		-resuelve: calculo ruta, fragmentacion y reensamblado de paquetes
+	-transporte:
+		-establece canal abstracto proceso a proceso
+		-resuelve:errores en capa de red (perdida pkg, pkg duplicados, reordenamiento depkg)
+		-los protocolos de aca y capas superiores corren solo en host (no en nodos intermedios)
+	-sesion:
+		-permite manejo de dif flujos de transporte de 1 app
+		-ej: streaming audio y video = video conferencia
+	-presentacion:	
+		-medidas para representacion de datos (Big endian..nro bits..)
+	-aplicacion:
+		-FTAM, Virtual terminal services
+
+7 ARQUITECTURA INTERNET (TCP/IP)
+	-cualquiera puede proponer un protocolo, pero se debe entregar
+		-su especificacion
+		-1 o 2 implementaciones representativas
+8 SOCKETS
+	-¿Como construir una app de red?
+		-pto partida "interfaz que expota la red"
+		-mayoria de los SO implementan protocolos de red (API)
+		-API en UNIX -> socket
+		-con esto podemos portar app a distintos SO
+		-UTILIZAR SOCKETS!!!
+	-Socket es la conexion entre una app y la red
+	-Servidor:
+		-int socket(...)el socket retorna un identificador
+		-int bind(...)bind, liga el socket a la direccion del servidor (ex IP)
+		-int listen(...) def cuantas conecciones pendientes en el socket
+		-int accept(...)open pasivo, se bloquea hasta que un participante remoto establece conexion
+	-Cliente:
+		-int connect(...)
+		-int send(...)
+		-int recv(...)
+

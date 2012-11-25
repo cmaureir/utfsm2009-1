@@ -1,0 +1,31 @@
+\begin{description}
+	\item[Función de Bessel]
+	Son soluciones canonicas $y(x)$ de la ecuación diferencial de
+Bessel:
+$$
+x^2 \frac{d^2 y}{dx^2} + x \frac{dy}{dx} + (x^2 - \alpha^2)y = 0
+$$
+	\item[$J_0$]
+	Función de Bessel de primera especie y orden 0. Para las soluciones de orden entero es
+posible definir la función $J_0(x)$ por su expansión en serie de Taylor en
+torno a $x = 0$:
+$$
+J_0(x)= 1-\frac{x^2}{2^2}+\frac{x^4}{2^2 4^2}-\frac{x^6}{2^2 4^2 6^2}\ldots
+$$
+$$
+J'_0(x)= \frac{dJ_0(x)}{dx} = -J_1(x)
+$$
+
+	\item[Función continua]
+	Una función $f$ es continua en el punto $a$, si $f$ está definida en algún intervalo abierto que contenga
+	a $a$ y si para cualquier $\epsilon > 0$ existe un $\delta > 0$ tal que:
+	$$si\ |x-a| > \delta\ entonces\ |f(x)-f(a)|< \epsilon$$
+	
+	\item [Malla]
+	La malla de la partición:
+	$$x_0 < x_1 < x_2 < \ldots < x_n$$
+	es el largo del subintervalo mas largo:
+	$$max|x_i - x_{i-1}|: i=1\ldots n$$
+	Si la malla tiende a cero, podemos tener una suma de Riemann, lo que conlleva a una integral de Riemann.
+
+\end{description}

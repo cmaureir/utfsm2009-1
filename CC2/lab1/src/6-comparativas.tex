@@ -1,0 +1,61 @@
+
+\scriptsize
+\begin{tabular}[b]{|l|l|l|}
+\hline
+a	&	\textbf{Newton}	&	\textbf{Lipschitz}	\\
+\hline
+0	&	for n=1 a N	&	lo mismo \\
+1	&	hace $t_{n+1} = t_n +h$	& lo mismo	\\
+2	& $\Phi_k = \Phi_k (u,v)$	& lo mismo	\\
+3	& $z_1(u, v) = u - \Phi_1 (u,v)$	& lo mismo	\\
+4	& $z_2(u, v) = u - \Phi_2 (u,v)$	& lo mismo	\\
+5	& $v = 0; (u_0, v_0) = (y^1_n, y^2_n);$	& lo mismo	\\
+6	& while $|z_1(u_v, v_v)| > \epsilon$ or $|z_2(u_v,v_v) |> \epsilon)$ & lo mismo	\\
+7	& $ \left[ {\begin{array}{c} u_{v+1}  \\ v_{v+1}\\ \end{array} }\right]  = 
+\left[ {\begin{array}{c} u_{v}  \\ v_{v}\\ \end{array} }\right]  +
+\left[ {\begin{array}{cc} 1-\frac{\delta \Phi_{1}}{\delta u} (u_{v}, v_{v}) & -\frac{\delta \Phi_{1}}{\delta v} (u_{v}, v_{v})   \\
+ -\frac{\delta \Phi_{1}}{\delta u} (u_{v}, v_{v})  & 1-\frac{\delta \Phi_{2}}{\delta
+v} (u_{v}, v_{v}) \\ \end{array} }\right]^{-1}
+ \left[ {\begin{array}{c} -z_{1} (u_{v}, v_{v})  \\ -z_2 (u_{v}, v_{v})\\ \end{array} }\right] 
+$ & $u_{v+1} = \Phi_1 (u_{v}, v_{v}); v_{v+1} = \Phi_2 (u_v, v_v);$	\\
+8	& $v = v+1$ & lo mismo	\\
+9	& end while & lo mismo	\\
+10	& $(y^1_n , y^1_n+1) = (u_v, v_v)$ & lo mismo	\\
+11	& end for & lo mismo	\\
+\hline
+\end{tabular}
+\\
+\normalsize
+
+
+Claramente podemos observar que las diferencias radican en el tipo de
+resolución, en el cual el algoritmo con iteraciones de Lipschitz es más simple
+que realizar las iteraciones de Newton.
+
+La cantidad de operaciones que realiza una iteración de Lipschitz quedan
+definidas por resolver $\Phi_1 (x,y)$ y $\Phi_2 (x,y)$. En cambio, una
+iteración de Newton en este caso debe calcular el plano tangente respectivo a
+cada función $y$ ($y_1$ e $y_2$), y luego resolver el intercepto con el plano
+del eje $X$ para obtener las soluciones de la ecuación que utiliza para ir
+acercándose al valor de $y_{n+1}$.
+
+Ahora, el método de Lipschitz, a pesar de ser más simple, requiere de muchas
+más iteraciones que el método de Newton, lo cual aumenta el tiempo de
+resolución del problema en \textbf{inserte valor acá}, a lo cual si uno le suma la
+poca capacidad de paralelización en la resolución del problema, puede llegar a
+ser más costosa computacionalmente. 
+\\
+Otra diferencia fundamental de estos dos métodos, es que para poder utilizar
+el método iterativo de Lipschitz, primero hay que verificar que la función
+converja de la siguiente forma:\\
+Dado $y'=f(x,y)$, despejamos $f(x,y)$ para lograr que en un costado de la
+ecuación quede solamente $x$ y la igualamos a $x=g(x,y)$
+\begin{itemize}
+	\item Si $|g'(x,y)|< 1$ Converge linealmente
+	\item Si $|g'(x,y)|= 0$ Converge cuadraticamente.
+	\item Si $|g'(x,y)|> 1$ Diverge linealmente
+\end{itemize}
+
+Si la condición de convergencia no se cumple, simplemente no podríamos
+utilizar este método para resolver el problema, ya que nos quedaríamos iterando
+infitamente, alejándonos cada vez más de la solución.

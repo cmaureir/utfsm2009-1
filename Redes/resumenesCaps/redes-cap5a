@@ -1,0 +1,99 @@
+CAPITULO 5a - Redes LAN Eth y Token
+
+2) CSMA/CD Redes Ethernet
+
+* Mas exitosa LAN (70' en los laboratorios XEROX)
+* Soporta 10 Mbps en su forma estandar
+* Raices, redes packet-radio Aloha
+* Restricciones fisicas:
+   -100 estaciones maximas por segmento (1024 en total)
+   -Entre dos estacions no pueden haber mas de cuatro repetidores(amplificador)
+   -Largo maximo 2500m (4 repetidores)
+   -Transmite en banda base codificado en Manchester
+
+* Otros estandares
+   -10 Base 5 (10Mbps, Banda Base, 500m), con coaxiales de 50 ohms
+   -10 Base T (10Mbps, T: par trenzado, 100m)
+	-Tener muchos segmentos pto a pto conectados por un repetidor de varias vias (HUB)
+
+
+* Formato Frame
+	  64b             48b                48b           16b             32b	    8b
+	Preambulo | Direccion Destino | Direccion Fuente | Tipo | Cuerpo | CRC | Postambulo
+	          |                  Header 14B                 |
+
+   -Formato fijado por DEC, Xerox e intel (DIX)
+   -Type: Demux Key
+   -Datos: hasta 1500Bytes, el minimo es 46B
+
+* Algoritmo de Colision
+   -Corresponde a CSMA/CD 1-persistente
+   -Funciona:
+	-Despues de la 1ra colision se espera 0 o 1 intervalo de tiempo d
+	-Despues de la 2da colision se espera 0,1,2 o 3 intervalos d aleatora%
+	-Despues de la colision i, se elige un numero entre 0 y 2^i - 1
+	-El numero max de intentos es 16. Despues de esto, se reporta al host el error de transmision.
+	-Se llama "backoff exponencial"
+	-En otras palabras, intervalos de espera son:
+	    k x d con k=0...2^n - 1 y d = 51.2 useg
+	-Cuando adaptador detecta colision, transmite JAM antes de parar (32b).
+	 Esto sign. que el frame mas chico en colision es 96b = JAM + 64[preambulo])
+	-una vez detectada la colision y detenido la trasmision, es espera t
+
+* Tamaño Minimo del Frame
+   -Como el largo maz del cable es 2500m al utilizar 4 repetidores, se tiene:
+	t = 10.87 useg
+   -Hay que agregar tiempos de señal y retardos electroncos.
+	t = 22,5 useg y 2t = RTT = 45 useg
+   -A 10Mbps significa 10^7 x 45 x 10^(-6) = 450b. Se det time-slot 512b = 2^9
+   -Un frame debe tener al menos 46 bytes.
+	 14B   +  46B  +  4B  = 64B
+	header   datos   CRC    512b
+
+* Algoritmo de Acceso	
+   -Diagrama de Flujo, Slide 18
+
+3) Redes Token Ring
+   -Muchas formas
+	-FDDI (Fiber Distributed Data Interface)
+	-PRONET (10Mbps - 80Mbps)
+	-IBM 4Mbps
+	-IEEE 802.5 16Mbps
+   -Similaridades con Ethernet
+	-El anillo se puede ver como un unico medio compartido
+	-Algoritmo distribuido de acceso al medio
+	-Los nodos ven todos los frames	
+   -Token:
+	-Coresponde a una secuencia especial de bits
+	-Si un nodo quiere transmitir, debe esperar token, sacarlo del anillo e insertar el frame
+	-Disciplina de servicio de los nodos -> Round Robin
+
+   -Especificaciones de FDDI
+	-a lo mas 500 estaciones (host)
+	-entre cada par de estaciones,dist max de 2km
+	-limite = 200km de fibra (dual -> 100km)
+	-Acepta fibra optica, coaxial, trenzado
+	-Se codifica en 4B/5B
+   -THT: Token Holding Time
+   -TRT: Token Rotating Time (tiempo en dar la vuelta)
+	
+	TRT <= Nodos activos x THT + Latencia anillo
+
+  	Nodos activos: cant nodos que tienen datos para transmitir
+	Latencia Anillo: tiempo del token en dar la vuelta, cuando nadie + tiene datos
+   -Hay que aseugrar que un nodo peuda transmitir dentro de un tiempo
+	-TTRT: Target Token Rotation Time, cota superior de TRT
+	¿Como? c/nodo mide el tiempo transcurrido entre llegadas sucesivas al token. (TRT medido)
+  	-Situaciones
+	    TRTmedido > TTRT (Token atrasado y nodo no transmite)
+	    TRTmedido < TTRT (Token adelantado y puede transmitir un tiempo dado por: TTRT - TRTmedido)
+	-Tipos:
+	   -Sincronicos(siempre puede)
+	   -Asincronicos (solo si el Token adelantado)
+	-Un nodo con datos asin. usa TTRT el tiempo y el nodo con datos sinc otro TTRT, es decir TRTmedido en cada nodo = 2 x TTRT (PEOR CASO)
+	-¿Como sabe un nodo is puede enviar trafico asincronico?
+	   TRTmedido < TTRT
+	-¿Que pasa si el tiempo que queda no es suficiente para enviar msj?
+	   no puede enviar!, es decir, TRTmedido <= TTRT + tiempo envio frame
+
+4) Adaptadores de Redes

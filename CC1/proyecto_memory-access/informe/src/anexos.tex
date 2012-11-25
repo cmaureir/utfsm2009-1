@@ -1,0 +1,258 @@
+\scriptsize
+\subsection{C\'odigo base}
+\begin{verbatimtab}
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "global.h"
+
+int x[N], y[N];
+float theta[N];
+int count[N];
+float g[(int)(N*1.5)];
+
+int main(int argc, char **argv)
+{
+	for(i=0;i<N;i++)
+	{
+		x[i] = i;
+		y[i] = i;
+		theta[i] = 6*random();
+	}
+
+	//	Almacenamos tiempo capturado
+	initialTime = getTime();
+
+	//	Now, accumulate data for all pairs of
+	//	points (i,j).
+	for(i=0; i<N; ++i)	//for each i < N
+		for(j=i+1; j<N; ++j)	//for each j < N
+		{
+			Dx = x[i]-x[j];
+			Dy = y[i]-y[j];
+			r = sqrt(Dx*Dx + Dy*Dy);
+			g[r] += cos(6*(theta[i]-theta[j]));
+			++count[r];
+		}
+
+	for (r = 0; r < MAX_R; r++)
+		g[r] = g[r] / count[r];
+
+	//	Calculando lo que ha tomado el calculo
+	finalTime = getTime();
+
+	//	Imprimimos resultados
+	results();
+	return 0;
+
+}
+\end{verbatimtab}
+
+
+\subsection{C\'odigo base mejorado mejorada}
+\begin{verbatimtab}
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "global.h"
+
+int x[N], y[N], ii;
+float theta[N];
+int count[N];
+float g[(int)(N*1.5)];
+float sin6[N], cos6[N];
+
+int main(int argc, char **argv)
+{
+	for(i=0;i<N;i++)
+	{
+		x[i] = i;
+		y[i] = i;
+		theta[i] = 6*random();
+	}
+
+	//	Almacenamos tiempo capturado
+	initialTime = getTime();
+
+	for(ii=0; ii<N; ++ii)
+	{ 	
+		sin6[ii] = sin(6*theta[ii]);
+		cos6[ii] = cos(6*theta[ii]);
+	}
+	
+	for(i=0; i<N; ++i)
+		for(j=i+1; j<N; ++j)
+		{
+		Dx = x[i]-x[j];
+		Dy = y[i]-y[j];
+		r = sqrt(Dx*Dx+Dy*Dy);
+		g[r] += cos6[i]*cos6[j]+sin6[i]*sin6[j];
+		++count[r];
+		}
+	
+	for (r = 0; r < MAX_R; r++)
+		g[r] = g[r] / count[r];
+
+	//	Calculando lo que ha tomado el calculo
+	finalTime = getTime();
+
+	//	Imprimimos resultados
+	results();
+	return 0;
+
+}
+\end{verbatimtab}
+
+\subsection{C\'odigo con localidad espacial mejorada}
+\begin{verbatimtab}
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "global.h"
+
+struct DataStruct
+{
+	int x, y;
+	float cos6, sin6;
+} data[N];
+
+struct AccumulationStruct
+{
+	int count;
+	float g;
+} accum[(int)(N*1.5)];
+
+int ii;
+float theta[N];
+
+int main(int argc, char **argv)
+{
+	for(i=0;i<N;i++)
+	{
+		data[i].x = i;
+		data[i].y = i;
+		theta[i] = 6*random();
+	}
+
+
+	//	Almacenamos tiempo capturado
+	initialTime = getTime();
+
+	for (ii = 0; ii < N; ii++)
+	{
+		data[ii].cos6 = cos(6*theta[ii]);
+		data[ii].sin6 = sin(6*theta[ii]);
+	}
+	
+	for(i=0; i<N; ++i)	
+		for(j=i+1; j<N; ++j)
+		{
+			Dx = data[i].x - data[j].x;
+			Dy = data[i].y - data[j].y;
+			r = sqrt(Dx*Dx + Dy*Dy);
+			accum[r].g += data[i].cos6 * data[j].cos6 + data[i].sin6 * data[j].sin6;
+			++accum[r].count;
+		}
+
+	for (r = 0; r < MAX_R; r++)
+		accum[r].g = accum[r].g / accum[r].count;
+
+	//	Calculando lo que ha tomado el calculo
+	finalTime = getTime();
+	
+	//	Imprimimos resultados
+	results();
+	return 0;
+}
+\end{verbatimtab}
+
+\subsection{C\'odigo con localidad espacial y temporal mejorada}
+\begin{verbatimtab}
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "global.h"
+#include "tabla.h"
+
+struct DataStruct
+{
+	int x, y;
+	float cos6, sin6;
+} data[N];
+
+struct AccumulationStruct
+{
+	int count;
+	float g;
+} accum[(int)(N*1.5)];
+
+int ii;
+int A,B,C,blocksize =1000;
+int flag;
+float theta[N];
+
+int main(int argc, char **argv)
+{
+	for(i=0;i<N;i++)
+	{
+		data[i].x = i;
+		data[i].y = i;
+		theta[i] = 6*random();
+	}
+
+	//	Almacenamos tiempo capturado
+	initialTime = getTime();
+
+	for(ii = 0; ii < N; ii++)
+	{
+		data[ii].cos6 = cos(6*theta[ii]);
+		data[ii].sin6 = sin(6*theta[ii]);
+	}
+
+	for(A=0; A<N; A+=blocksize)
+	{
+		C=A;
+		for(B=A,flag=1; B<N; B+=blocksize,flag=0)
+		{
+			for(i=A; i<A+blocksize; ++i)
+			{	
+				if(flag)
+				{
+					C++;
+					for(j=C; j<B+blocksize; ++j)
+					{
+						Dx = data[i].x - data[j].x;
+						Dy = data[i].y - data[j].y;
+						r = sqrt(Dx*Dx + Dy*Dy);
+						accum[r].g += data[i].cos6 * data[j].cos6 + data[i].sin6 * data[j].sin6;
+						++accum[r].count;
+					}
+				}
+				else
+					for(j=B; j<B+blocksize; ++j)
+					{
+						Dx = data[i].x - data[j].x;
+						Dy = data[i].y - data[j].y;
+						r = sqrt(Dx*Dx + Dy*Dy);
+						accum[r].g += data[i].cos6 * data[j].cos6 + data[i].sin6 * data[j].sin6;
+						++accum[r].count;
+					}
+			}
+			C=B;
+		}
+	}
+
+	for (r = 0; r < MAX_R; r++)
+		accum[r].g = accum[r].g / accum[r].count;
+
+	//	Calculando lo que ha tomado el calculo
+	finalTime = getTime();
+	
+	//	Imprimimos resultados
+	results();
+	return 0;
+
+}
+\end{verbatimtab}

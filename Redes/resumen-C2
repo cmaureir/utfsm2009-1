@@ -1,0 +1,856 @@
+
+7 Enrutamiento
+	1- Conceptos Introductorios.
+	2- Vector Distancia (RIP).
+	3- Direccionamiento y Jerarquía.
+
+1- Conceptos Introductorios
+	¿Como los switches llenan sus tablas de despacho?
+		- una red se modela como un grafo.
+		- los arcos representan links de comunicación y los nodos los switches.
+		- los arcos tienn rótulos que establecen costos acorde a alguna métrica: latencia, BW, ...etc.
+	El problema del Routing
+		- se trata de encontrar el camino más corto entre dos nodos.
+		- una complicación adicional es que las redes son dinámicas y sufren cambios permanentes.
+		- en forma práctica se resuelve corriendo protocolos especiales entre los switches (Algoritmo distribuido).
+		- la centralización es enemiga de la escalabilidad.
+
+2- Algoritmo Vector-Distancia
+	~ Propuesto por Cisco.
+	- la idea de este algoritmo está sugerida por su nombre:
+		- Cada nodo construye un arreglo de una dimensión (vector) que contiene las distancias (costos) a los demás nodos de la Red.
+		- Este vector se distribuye a todos los vecinos.
+	- Distancia: Se considera como métrica el número de saltos. Un link caído tiene un costo infinito.
+	Ejemplo
+		- algoritmo: Supongamos una red en la cual link tiene costo igual a uno (la métrica de distancia en este caso, corresponde al número de saltos.
+		Matríz de distancias:
+			nodo		distancia para llegar al nodo
+				A	B	C	D	E	...
+			A	0	1	1	inf	1	...
+			B	1	0	1	inf	inf
+			C	1	1	0	1	inf
+			D	inf	inf	1	0	inf	
+			E	1	inf	inf	inf	0
+			...
+			- Esta matriz contiene las distancias iniciales. Nadie dispone de esta matriz.
+
+	Algoritmo
+		1- inicialmente cada nodo fija un costo de 1 a sus vecinos y inf a los demás nodos.
+			- Por ejemplo A piensa que puede llegar a B de un salto y que D no es alcanzable.
+		2- cada nodo envía un mensaje a sus vecinos directos con su lista personal de distancias.
+		 - si algún nodo recibe información de A, y se da cuenta que vía A hay un camino más corto, actualiza su tabla.
+		ejemplo: B aprende de A que A->E en un salto y como B->A también en un salto, aprende que B->E en dos saltos, y por lo tanto C->E en tres saltos.
+	Distancias finales Globales
+		- al final, cada nodo tiene almacenada su distancia mínima.
+			nodo		distancia para llegar al nodo
+				A	B	C	D	E	...
+			A	0	1	1	2	1	...
+			B	1	0	1	2	2
+			C	1	1	0	1	2
+			D	2	2	1	0	3	
+			E	1	2	2	3	0
+			...
+	Perspectiva de Nodo
+		- en la práctica, cada nodo tiene una tabla de enrutamiento que consiste en una lista del tipo:
+			{Destino, Costo, Salto_siguiente}
+		- por ejemplo, la tabla para el nodo B es:
+			Destino	Costo	Salto_siguiente
+			A	1	A
+			C	1	C
+			D	2	C
+			E	2	A
+			F	2	A
+			G	3	A
+		- también, cada nodo envía y recibe actualizaciones de sus vecinos.
+			- cada actualización tiene la forma:
+				{Destino, Costo}
+		- cada vez que un nodo recibe una actualización de sus vecins que incluyen una ruta mejor que la actual, cambia la ruta en la Tabla de Enrutamiento.
+		- ¿Cuando un nodo decide enviar actualizaciones a sus vecinos? Hay dos circunstancias:
+			- cada nodo envía en forma frecuente (aún si nada ha cambiado)
+			- Trigger Update: cada vez que cambia la Tabla de Enrutamiento, envía información a sus vecinos.
+	Robustez del Algoritmo
+		- ¿qué pasa cuando un enlace o un nodo falla?
+			- El nodo que primero se da cuenta, envía una nueva lista de distancias a sus vecinos.
+		- ¿cómo detectar una falla? hay varias aproximaciones:
+			- cada nodo continuamente prueba sus links enviando paquetes de control y esperando ACK.
+			- el nodo se da cuenta cuando deja de recibir actualizaciones periódicas.
+	Ejemplo: F detectó que su link a fallado
+		1- F fija su nueva distancia a G como inf y se la pasa a A.
+		2- Como A sabe que tiene 2 saltos a G vía F, A fija su nueva distacia a G como inf.
+		3- Con la nueva actualización desde C, A aprende que C tiene 2 saltos a G vía D, entonces A sabe que puede alcanzar G en 3 saltos vía C y nuevamente actualiza su tabla.
+		4- Cuando A advierte a F, F sabe que puede alcanzar a G con costo 4 vía A. De esta forma se logra la estabilidad.
+	Cuenta a Infinito
+		- ejemplo: 0- se cae el link a A a E.
+		1- en las siguientes actualizaciones A advierte distancia infinita a E, pero B y C advierten distancia de 2 a E.
+		2- B, después de escuchar que E se puede alcanzar en dos saltos desde C, concluye que puede alcanzar a E en 3 saltos y advierte de esto a A.
+		3- A concluye que puede alcanzar a E en 4 saltos vía B y advierte de esto a C.
+		4- C concluye que puede alcanzar a E en 5 saltos, vía A.
+		5- Se continua así, hasta que se obtiene un costo que se podría considerar inf.
+		- Problema del algoritmo: Lenta convergencia.
+	RIP: Routing Information Protocol
+		- uno de los protocolos de routing más utilizados en  redes IP es RIP.
+		- RIP es una implementación directa del algoritmo vector-distancia.
+		- los routers que corren RIP envían paquetes de aviso cada 30seg.
+			- También lo hacen cada vez que se cambian tablas de distancias.
+		- Distancias válidas son de 1 a 15 y 16 se considera infinito. Esto limita el tamaño de redes que usan RIP a rutas con 15 saltos como máximo.
+
+3- Direccionamiento y Jerarquía
+	- cada nodo de una red de Packet Switching tiene una dirección única.
+		- Una dirección de este tipo se denomina dirección plana.
+		- Por ejemplo, Ethernet tiene dirección plana.
+	- la dificultad con las direcciones planas es que las tablas de despacho (forwarding) necesitan una entrada para cada host.
+		- Esto introduce un serio problema de escalamiento ya que estas tablas crecen linealmente con el número de host.
+	- para lograr escalabilidad se introducen direcciones jerárquicas. (Ej. Sistema Telefónico)
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extra
+
+	 ~ Vector-Distancia
+	/	RIP (nació de Cisco)
+Routing
+	\
+	~ Links-State (nació del codigo abierto)
+		OSPF
+
+	Tabla de despacho 	<----	Tabla de Routing (RIP)
+
+	OPNET -> Herramienta para virtualizacion de redes y protocolos:	omnetpp.org
+25/05/2009
+
+8 ATM y MPLS
+	1-Introducción
+	2-ATM
+	3-MPLS
+
+1- Introducción
+	- tanto ATM como MPLS son tecnologías de packet switching.
+	- ATM tuvo una gran importancia en los años 80 y comienzo de los 90, fuertemente impulsada por la industria de telecomunicaciones.
+	- Si bien son pocas las implementaciones actuales, su importancia reside en que se constituyó en la base de MPLS.
+	- MPLS (Multiprotocol Label Switching), tuvo como motivación mejorar el desempeño de Internet.
+	- MPLS (combina la flexibilidad de los datagramas, con las propiedades de los circuitos virtuales (ATM).
+
+2- ATM
+	- ATM: Asynchronous Transfer Mode.
+	- ATM es una red de conmutación de paquetes basada en el modelo de Circuito Virtual, es decir, un modelo orientado a conexión.
+	- Provee las siguientes funcionalidades:
+		- integridad en la secuencia.
+		- baja varianza ene l retardo de paquetes.
+		- calidad de servicio (Q o S).
+		- tecnología escalable: 155Mbps a 2.5Gbps.
+	Historia
+		- ATM tiene su origen en redes ISBN (broadband ISDN) definida por la CCITT.
+		- en 1989 la ITU adopta el formato de celdas de 53B.
+		- en 1991 se constituye el ATM Forum.
+			- Actualmente se cocnoce como MFA Forum.
+		- en 1992 se entrega la primera especificación.
+	Celdas de Tamaño Fijo
+		- ¿por qué celdas de 53B y de tamaño fijo?
+			- Simplifica la construcción de switches
+			- Se minimiza el largo de las colas de los switches y por lo tanto se disminuye el retardo.
+		- supongamos un switch con paquetes de largo variable.
+			- el tiempo de transmisión será de 327,68 useg.
+			- ¿Qué ocurrirá si un paquete de alta prioridad llega justo cuando el switch comienza a transmitir?.
+			- RP: ¡Se debe esperar 327,68 useg por el acceso al link.!
+			- Por el contrario, si el paquete fuera de 53B, este tiempo sólo sería de 4.24 useg.
+		Discución
+			- las colas de celdas tienden a ser más cortas que colas de paquetes por las siguientes razones:
+				-Al llegar un paquete a una cola vacía, no se puede transmitir hasta que llegue complemtamente.
+					- mientras tanto, el link está ocioso.
+				- Ahora si el paquete se descompone en un tren de varias celdas, al llegar la primera celda se puede comenzar a transmitir.
+			- volviendo al ejemplo anterior, si llegan 2 paquetes de 4KB a la cola al mismo tiempo:
+				- El link estará ocioso por 327,68 useg mientras los dos paquetes llegan.
+				- Al final de este tiempo, tendremos 8KB en la cola (recordar que el buffer no se libera mientras no se transmite completamente el paquete).
+				- Por otro lado, si la misma información se pone en un tren de celdas, la transmisión puede comenzar a los 4.24 useg después que la primera celda comienza a llegar.
+				- Transcurrido un tiempo de 327,68 useg sólo habrá 4KB de datos.
+	Formato de Celdas
+			4b	8b	16b	3b	1b	8b	48b
+			GFC	VPI	VCI	Type	CLP	HEC	Datos
+		Existen dos formatos: UNI (User Network Interfase) y NNI (Network to Network Interfase).
+		- GLC: Generic Flow Control. No totalmente especificado. Si la celda es NNI, GFC se reemplaza por bits VPI.
+		- VPI: Virtual Path Id.
+		- VCI: Virtual Channel Id. Type: Indica funciones de control. Si los 3 bits son ceros indica datos.
+		- CLP: Cell-loss priority. Si está en 1, el switch puede descartar la celda.
+		- HEC: CRC-8
+	Direcciones y Caminos Virtuales
+		- la dirección de 24 bits tiene una jerarquía impuesta por los 8bits de VPI y los 16 bits de VCI.
+		- este esquema permite usar redes públicas usando sólo los VPI.
+		- Por ejemplo, si una empresa tiene 2 sitios conectados vía una red ATM pública, usa los 24 bits en total, pero para el despacho usa sólo los 8 bits de VPI.
+		- la ventaja es que la red pública ve sólo una conexión lo cual simplifica el despacho de celdas y diseño de switches.
+	Ejemplo de despacho de celdas
+		Puerta entrada		VPI/VCI entrada		Puerta Salida		VPI/VCI Salida
+			1			29			2			45
+			2			45			1			29
+			1			64			3			29
+			3			29			1			64
+	Segmentación y reensamblado
+		- El esquema tradicional usados por los stacks de protocolos que consiste en agregar headers en cada nivel no funciona en ATM.
+	Solución: Protocolo AAL
+		- la solución es fragmentar el mensaje de alto nivel en paquetes de bajo nivel.
+			- los paquetes de bajo nivel se transmiten por la red y se reensamblan en el destino.
+		- esto implica poner una capa de protocolo entre ATM y algún protocolo de largo variable como IP.
+			- esta capa se denomina AAL (ATM Adaptation Layer).
+			- el header de un paquete de AAL contiene la información necesaria para reensamblar el mensaje original.
+	Estado Actual de ATM
+		- La industria TIC generó un consorcio llamado ATM Forum en 1991.
+			- al día de hoy está plenamente vigente.
+		- En 2004, el ATM Forum se unió a la laianza formada por MPLS y Frame Rely generando una nueva organización llamada MFA Forum.
+		- Más tarde se vuelve a unir con IP/MPLS Forum que es el consorcio actualmente vigente.
+
+3- MPLS
+	- MPLS: Multi Protocol Laber Switching.
+	- MPLS permite el despacho de paquetes a través de una etiqueta corta y de longitud fija.
+		- esta etiqueta se agrega sobre los paquetes IP.
+	- Los nodos MPLS despachan paquetes basándose en la etiqueta y no en dirección IP.
+	Historia
+		- el grupo IETF a cargo de MPLS se creó en 1997.
+		- la necesidad que impulsó el desarrollo de MPLS es la necesidad de lograr mejoras en el desempeño de las redes.
+		- MPLS es una técnica que permite que los routers sean más rápidos:
+			- Despachar sobre etiquetas es más rápido que búsqueda de prefijos IP en tablas de despacho.
+			- Permite que un nodo realice el trabajo de un router con el desempeño de un switch ATM.
+	Ventajas
+		- Nuevas funcionalidades en el despacho de paquetes:
+			- VPN.
+			- Ingeniería de tráfico.
+			- El transporte de paquetes lo baja a la capa 2.
+			- Calidad de Servicio.
+			- Integración con dispositivos ópticos.
+	Clase de equivalencia de despacho (FEC)
+		- los paquetes se clasifican en sus FEC.
+		- un FEC es un grupo de paquetes que se despachan de la misma manera.
+		- el despacho de paquetes consisten en:
+			- Asignar un paquete a un FEC.
+			- Determinar el siguiente salto para el FEC.
+	Diferencias entre IP y MPLS
+		- en IP en cada salto:					- en MPLS:
+			- Se reclasifician paquetes dentro de un FEC		- Al ingreso:
+			- Se determina el siguiente salto para el FEC			- Se clasifica en un FEC.
+											- Siguiente Salto para el FEC.
+										- En la red MPLS:
+											- No hay más clasificación de paquetes.
+											- El siguiente salto sólo se basa en la etiqueta.
+	Hardware: LSR
+		- el LSR (Label Switching Router) es el componente principal del protocolo MPLS.
+		- el LSR está formado por:
+			- Un Router IP.
+			- Un Switch ATM al cual se le ha incorporado un ``label switch controller''.
+		- una red MPLS está constituida sólo por LSR.
+			- La interfaz entre una red MPLS y una red IP la provee el LSR de borde.
+				- este componente se denomina ELSR (Edge Label Switch Router).
+	Estructura de un LSR
+		~ ingenieria de tráfico.
+		- Unidad de Control
+			- Protocolos Routing IP
+			- Tabla de Routing IP
+			- Routing IP MPLS
+			- LIB Label Information Base
+		- LFIB Label Forwarding Information Base
+	Etiquetas
+		- es posible utilizar más de una etiqueta.
+			- Stack de etiquetas: conjunto ordenado de etiquetas.
+		- los LSR despachan paquetes basándose en el valor de la etiqueta que está en el tope del stack.
+		- las etiquetas tienen 4 Bytes en total:
+			- Label: 20 bits.
+			- Exp: Bits experimentales (3 bits).
+			- S: Fondo del stack.
+			- TTL: Tiempo de Vida (8 bits).
+	Estructura de las Etiquetas
+			  20 b		3 b 	1 b	8 b
+			  Label		EXP	S	TTL
+			\					/
+				\			/
+		MAC header		Shim header		Header IP
+	Resumen
+		- switches ATM se introdujeron en el mercado a fines de 1980.
+			- La evolución de ATM generó una arquitectura que se diferencia notoriamente de IP:
+				- IP: datagrama sin conexión.
+				- ATM: circuito virtual con conexión.
+				- Mecanismos de dirección totalmente diferentes.
+		- con el tiempo muchas redes ATM terminaron despachando datagramas IP, debido al éxito de Internet.
+		- MPLS permite la funcionalidad de la capa 3 con el desempeño de la capa 2.
+		- beneficios adicionales son:
+			- Realizar ingeniería de tráfico.
+			- Crear VPN.
+			- Eliminar múltiples capas simplificando la administración de la red.
+
+
+29/05/2009
+
+9 Bridges y LAN Extendidas
+	1- Introducción.
+	2- Motivación.
+	3- El Learning Bridge.
+	4- Algoritmo Spanning Tree.
+	5- Ventajas y Limitaciones de los Bridges.
+
+1- Introducción
+	- hasta ahora hemos estudiado como se construyen las redes.
+		- En este capítulo estudiaremos como se conectan distintas redes.
+	- se deben resolver dos problemas:
+		- heterogeneidad.
+		- escalamiento.
+	- la forma más simple es extender una LAN a través de bridges.
+
+2- Motivación
+	- ¿Cómo extender una LAN?
+		- Respuesta: usar repetidores.
+		- Limitación: no pueden haber más de 4 repetidores entre cualquier par de host en el estándar Ethernet.
+
+3- El Bridge
+	- una alternativa distintas al repetidor es el bridge.
+	- el bridge es un nodo especial, que opera en un modo promiscuo y despacaha frames entre las dos LAN.
+	- un conjunto de LAN conectadas por uno o varios bridges forman una LAN extendida.
+	- ¿Qué diferencia tiene un bridge con un switch?
+		- Respuesta: un bridge conecta dos o más redes de acceso múltiple, mientras que un switch conecta un conjunto de líneas punto a punto.
+	El Learning Bridge
+		1- el brige escucha en modo promiscuo, recibiendo cada paquete transmitido.
+		2- por cada paquete recibido, el bridge almacena su dirección en una caché junto con el número de puerta por el cual fue recibido.
+		3- por cada paquete recibido, el bridge busca en su caché la dirección que aparece en el campo destino:
+			a) Si no está en el caché, lo envía a todas las puertas, excepto por la que llegó.
+			b) Si está, lo envía sólo a la puerta especificada en la Tabla.
+		4- el bridge observa cada entrada de la caché y la borra si después de un tiempo no ha recibido nada con esta dirección como dirección fuente.
+	Ejemplo de Funcionamiento del Bridge
+		- inicialmente, B no sabe nada.
+			a) A transmite un paquete con destino D.
+				- Se recibe por port 1.
+				- Como el bridge no sabe nada, hace un forward.
+			b) D transmite un paquete a A.
+				- El bridge ahora aprende que D reside en la port 2.
+	Problemas con los Loops
+		- el algoritmo anterior falla cuando la LAN extendida presenta loops.
+		- los loops son difíciles de detectar y en algunos casos se agregan para proporcionar redundancia frente a fallas.
+
+4- Algoritmo Spanning Tree
+	- para evitar los loops, es necesario superponer un árbol.
+	- para encontrar el Spanning Tree en una LAN extendida, los Bridges utilizan un algoritmo distribuido.
+	- el Algoritmo Spanning Tree selecciona los bridges encargados de despachar frames.
+	- el Algoritmo fue desarrollado por Radia Perlman de DEC.
+		- Actualmente es la especificación IEE 802.1D.
+	El Algoritmo Spanning Tree
+		- cada bridge tiene un identificador (id) único (ej., B1, B2, B3).
+		- se selecciona como raíz del Spanning Tree al bridge que tiene menor id.
+		- el bridge raíz despacha paquetes por todas sus puertas.	
+		- cada bridge calcula el camino más corto a la raíz y observa cual de sus puertas está en ese camino.
+			- Esta puerta es seleccionada como el camino preferido del bridge hacia la raíz.
+		-  todos los bridges conectados a una LAN, eligen a un bridge responsable para despachar paquetes hacia la raíz.
+			- Este bridge se denomina bridge designado.
+		- el bridge designado es el que está más cerca de la raíz.
+			- Si hay empate, el de menor id gana.
+		- como cada bridge está conectado a 2 o más LAN, participa en la elección de bridge designado para cada LAN.
+		- el bridge despacha frames sobre las puertas para las cuales es el bridge designado.
+	Ejemplo
+		- B1 es la raiz (tiene menor id)
+		- B3 y B5 están conectados a la LAN A, pero B5 está más cerca de la raíz.
+		- B5 y B7 estánconectados a la LAN B, y están a la misma distancia de la raíz, pero B5 es designado ya que tiene menor id.
+	Algoritmo Distribuido
+		- ¿Cómo se aplica el algoritmo si nadie conoce la red completa?
+			- Respuesta: Intercambiando mensajes de configuración.
+		- los mensajes de configuración contienen:
+			- el id del bridge que envían la información.
+			- el id del bridge que cree ser raíz.	
+			- la distancia (en N de saltos) del bridge que envía al bridge raíz.
+		- cada bridge registra los mejores mensajes de configuración que ha visto en cada puerta incluido los que ha enviado.
+		- después de recibir mensajes sobre una puerta determinada, lo compara y actualiza.
+		- una vez que se da cuenta que no es raíz, deja de enviar mensajes de configuración propios y sólo despacha de otros bridges.
+		- cada cierto tiempo vuelve a generar mensajes de configuración (la red puede haber cambiado).
+		- el Spanning Tree es dinámico y se reconfigura periódicamente.
+
+5- Ventajas y Limitaciones de los Bridges
+	Ventajas y Limitaciones
+		- no solucionan problemas de heterogeneidad y escalabilidad.
+		- en la práctica se pueden conectar alrededor de 10 LAN.
+			- No se puede imponer una jerarquía a una LAN extendida.
+			- Los bridges no despachan todos los frames de broadcast (no escala).
+		- como hacen uso de los header de frames, sólo soportan redes que tengan el mismo formato de direcciones.
+			- Como Ethernet y FDDI tiene 48 bits de dirección, es posible:
+				- Eth <-> Eth.
+				- FDDI <-> FDDI.
+				- Eth <-> FDDI.
+		- como ventaja, es posible tener múltiples LAN conectadas en forma transparente, es decir, los host no necesitan correr protocolos especiales.
+		- la transparencia también puede ser dañina:
+			- Aplicaciones diseñadas para LAN, al llevarlas a LAN extendidas pueden tener consecuencias desastrozas debido a:
+				- bridges congestionados.
+				- altas latencias.
+				- cambios de secuencia en frames.
+	El Switch Ethernet
+		- un Switch Ethernet es simplemente un bridge que tiene la capacidad de despachar un determinado número de paquetes en paralelo.
+			- También el número de puertas suele ser mayor que un bridge.
+		- los fabricantes también agregan distintas funcionalidades como la capacidad de generar VLAN.
+
+01/06/2009
+Tecnologías del Intenet
+	1- Introducción
+	2- El protocolo IP
+	3- Fragmentación y Reensamblado
+	4- Direccionamiento Global
+	5- Despacho de Paquetes
+	6- Protocolo ARP
+	7- NAT: Network Addres Translation
+	8- Internet Global y DNS: Domain Name System
+
+1- Introducción
+	- exploraremos formas de ir más allá de las limitaciones de las redes extendidadas, permitiendo interconectar redes muy heterogéneas en forma razonablemente eficiente.
+	- estas redes las llamaremos inter-redes o internetworks.
+	¿ Qué es una inter-red?
+		- inter-red = internet.
+		- Llamaremos internet a una interconexión arbitraria de redes para proporcionar un servicio de despacho de paquetes host-host.
+			- También se llama red de redes.
+		- Llamaremos Internet (I mayúscula) a la gran red global.
+		- una inter-red utiliza tecnología Ethernet, FDDI, ATM o cualquier tecnología de las anteriormente estudiadas.
+	Un ejemplo de inter-red
+		- podemos apreciar una gran variedad de tecnologías.
+			- R = Router.
+			- H = Host.
+
+2- El Protocolo IP
+	- el protocolo IP es la clave para interconectar en forma escalable redes heterogéneas.
+		- fue inventado por Kahn y Cerf.
+	- otra alternativa a IP (pero no escala para redes grandes es Novell IPX basado en XNS desarrollado por Xerox.
+	- IP es un protocolo que corre en todos los nodos (host y routers) en el conjunto de redes y permite ver el conjunto de redes como una sola red.
+	Niveles de Protocolos que interconectan H1 con H8 de la figura anterior
+	Modelo de Servicio
+		- IP provee un servicio Host to Host.
+		- este servicio está limitado por los servicios que son capaces de proveer cada una de las redes físicas.
+			- no se le pueden pedir peras al olmo.
+		- el modelo de servicio IP, consta de dos partes:
+			- Esquema de direcciones.
+			- Despacho de paquetes sin conexión (Datagramas).
+		- el servicio se llama también del mejor esfuerzo.
+			- No hay garantía que el paquete despachado llegue.
+		- el servicio es NO confiable.
+	Despacho de Datagramas
+		- el datagrama Ip es la pieza fundamental del protocolo.
+		- cualquier tecnología soporta IP.
+			- Cuando fue creado, no existía gran parte de la tecnología actual.
+	Formato del Datagrama
+			0	4	8	16	19		31
+			Versión	 Hlen	TOS		Largo
+				Identificación	Flags		Offset
+			TTL		Protocolo		Checksum
+					Dirección Fuente
+					Dirección Destino
+				Opciones (variable)		Pad (relleno)
+						Datos
+						Datos
+	Campos de Datagrama IP
+		- Versión: la actual es IPv4.
+		- Hlen: largo del Header en palabras de 32b (normalmente es 5).
+		- TOS: Type of service. No es muy usado e indica prioridad.
+		- Largo: Largo del datagrama en Bytes. Incluye el Header (el máximo es 65535 B).
+		- Identificación, Flags y Offset: Indormación para fragmentacion y reensamblado.
+		- TTL: Time to live. Contador de saltos. Cuando llega a creo, el datagrama se descarta.
+		- Checksum: Checksum IP que considera el header completo.
+		- Protocol: Es la clave de demultiplexión (DEMUX Key) que permite asociar el datagrama a protocolos superiores.
+		
+		- Los Bytes son transimitidos en el orden ``Big Endyan''.
+
+3- Fragmentación y Reensamblado de paquetes
+	- uno de los problemas de proporcionar un servicio Host to Host sobre un conjunto heterogéneo de redes,
+	 es que cada tecnología de red tiene su propia idea del largo de los frames que circulan por ella.
+		- Eth: 1500 B.
+		- FDDI: 4500 B.
+	- una solución es elegir el tamaño más pequeño y fijar así el tamaño del datagrama.
+		- Sin duda, esto no es eficiente, ya que si el frame es muy chico la relación tamaño_header/tamaño_datos es muy chica y se gasta demasiado BW.
+	Fragmentación
+	Solución
+		- cada red establece el largo máximo de sus frames.
+			- Este valor es propio de cada red y se denomina MTU: Maximun Transmission Unit.
+		- la fragmentación ocurre cuando en el camino hay una red con MTU menor que el tamño del datagrama.
+		- Ejemplo:
+			| Eth |	IP		|
+				 1500 B + 18 B
+	Encapsulación Ethernet (RFC 894)
+		64b		48b		48b		16b		32b	8b
+		Preámbulo	Dir. Destino	Dir. Fuente	Tipo	Cuerpo	CRC	Postámbulo
+	Datagramas IP por distintas redes Físicas (ejemplo inicial)
+	Observaciones
+		- en el ejemplo anterior, el protocolo Point to Point (P2P) tiene un MTU de 532 B.
+		- las ideas fundamentales son:
+			- Cada fragmento es en si mismo un datagrama independiente.
+			- Cada datagrama es reencapsulado nuevamente al cambiar de red.
+			- El reensamblado ocurre en el host destino y no en cada router.
+			- Los RFC 791 y RFC 815 describen los procedimientos de fragmentación y reensamblado.
+	Campos del datagrama con fragmentación
+
+4- Direcciones Globales
+	- IP provee un esquema de direcciones.
+		- Este esquema es global, es decir, cada dirección es única.
+	- cada dirección IP consta de dos partes:
+		- Dirección de Red.
+		- Dirección de Host.
+	- la dirección completa es de 32b (IPv4) y 128b (IPv6).
+	- IP establece 3 clases de direcciones.
+	Formato de Direcciones
+					7		24
+		- Clase A	0 |	Red |		Host |
+					14		16
+		- Clase B	1|0|	Red	|	Host |
+					21		8
+		- Clase C	1|1|0|	Red	     | 	Host|
+		- la dirección se escribe en decimal.
+			- Por ejemplo, la dirección
+				107.213.42.0/24
+				red	| 24 bytes
+5- Despacho de Datagramas IP
+	- los aspectos que se deben considerar en el despacho de datagramas:
+		- Cada datagrama IP contiene la dirección del host destino.
+		- La parte de red de la dirección es única y define una red física.
+		- Los host y routers que comparten una misma red se pueden comunicar directamente enviando frames, aprovechando este sericio de red.
+		- Cada red física que es parte de Internet tiene al menos un router, que por definición está conectado al menos a otra red física.
+			- este router puede intercambiar paquetes con host o routers de cualquier red.
+	Estructura de la tabla de despacho:
+			- número de red y siguiente salto.
+		- normalmente también se incluye en la tabla un router por defecto.
+	Ejemplo de Tabla de Despacho Real
+		- netstat -rn (o route -n)
+		- flags: U= up, G= gateway, H= host.	
+	Algoritmo de Despacho Caso general
+		- if (N red Destino == N de red de una de mis interfaces)
+			despachar Paquete al destino sobre esa interfaz.
+		- else if (N red Destino está en la tabla de Despacho)
+			despachar Paquete al Router Siguiente Salto.
+	Algorimto de Despacho: El host sólo tiene una interfaz y un Router por defecto.
+		- if (N red Destino == mi N de red)
+			despachar Paquete al destino directamente
+		- else
+			despachar Paquete al Router por defecto.
+	H1 -> H3
+	H1 -> H8
+	Discusión
+		- en la práctica, las direcciones de Redes son más largas. Ej. 200.1.19
+		- las tablas de los Routers suelen ser más complejas y se llenan corriendo protocolos de routing.
+		- en el ejemplo se observa un aspecto relevante de la escabilidad: Las tablas de despacho son pequeñas.
+	DHCP
+		- normalmente las Ip de un router se configuracn manualmente
+		- adicionalmente DHCP entrega información adicional como máscaras, gateway por defecto y dirección DNS local.
+		- Dinamyc Host Configuration Protocol.
+		- protocolo de Cliente-Servidor.
+		- usualmente, en cada subred hay un server.
+			- si no hay servidor presente en la subred, se usa un agente (DHCP relay agent), típicamente un router que conoce la dirección del server para la red.
+		- es un protocolo que tiene 4 pasos:
+			- DHCP server discovery: El host envía un mensaje UDP al puerto 67 con una IP destino broadcast (255.255.255.255) y una IP fuente 0.0.0.0 .
+			- DHCP server offer: El servidor responde con un mensaje broadcast 255.255.255.255 .
+				- la respuesta es broadcast debido a que pueden existir muchos server y contiene:
+					- IP propuesta.
+					- máscara de red.
+					- tiempo que la IP será válida (horas, días..)
+			- DHCP request: El cliente selecciona una IP y le envia una petición al servidor seleccionado.
+			- DHCP ACK: El servidor responde.
+
+6- Obtención de la Dirección Física:
+	- la dirección IP es una dirección lógica.
+	- la red física sólo entiende direcciones físicas.
+	- es necesaria la conversión:
+		- IP --> dirección_física.
+	- problema:
+		- IP tiene 32 bits y Eth 48 bits.
+		- Además, Eth es global única y no es programable.
+	- solución: Manejar tabla (administración compleja).
+	Protocolo ARP
+		- Address tRanslation Protocol.
+		- examinaremos el protocolo ARP que permite obtener dinámicamente las direcciones físicas.
+		- se basa en las facilidades de broadcast de Eth y FDDI:
+			- cada host maneja una caché.
+			- si un host desea enviar un datagrama a un host o un Router, primero mira la caché.
+				- si no está, usa el protocolo ARP.
+		- basicamente, es preguntarle a todos los host de quien pertenece la dirección IP.
+		Ejemplo examinar el contenido de la caché
+			- el comando arp permite mostrar el contenido de la caché de ARP. Se requiere permiso de root.
+			- ejemplo:
+				- $ arp -a
+				- wifi20-1.campus.utfsm.cl (10.9.20.1) at 00:23:5d:d7:cb:72 [ether] on wlan0
+	Protocolo ICMP
+		- Internet Control Message Protocol
+		- ¿Qué pasa si no se encuentra una dirección?
+		- ¿Qué pasa si se cumple TTL (time to live)?
+		- el protocolo ICMP define una serie de mensajes de error que envían al host fuente cuando ocurre algún error.
+		- ejemplo: diseño de traceroute.
+
+7- NAT: Network Addres Translation
+	- IPv4 está al borde del colapso.
+		- IPv6 soluciona el problema de escasez de IP, pero la transición será lenta.
+	- un router NAT permite tráfico entrante y saliente de una red privada.
+	- además de solucionar el problema de las escasez de direcciones IP, NAT tiene otras razones:
+		- Seguridad
+		- Administración
+	- NAT actúa comouna secretaria recepsionista de una oficina que permite llamar a clientes y contactar clientes con funcionarios.
+	- un NAT es un dispositivo que puede ser un router, cortafuego o computador.
+	NAT Estático
+		- se mapean IP no registradas en IP registrada uno a uno.
+	NAT Dinámico
+		- se mapean IP no registradas en IP registradas sobre un rango de IP disponibles.
+	NAT Dinámico PAT (Port Address Translation)
+		- cada host de la red privada traslada su dirección a la misma IP registrada, pero con diferente número de puerto.
+
+8- Internet Global y DNS.
+	- Hoy día, existen muchas redes interconectadas.
+	- Los protocolos de enrutamiento no escalan bien cuando hay millones de redes interconectadas.
+		- ¿Cómo puede funcionar internet?
+	- Existe una estructura.
+	Estructura de Internet Global
+		- en 1990, la estructura de Internet era centralizada en el NSFNET Backbone (en EEUU, de investigación), con una red de packet switching que utiliza links T1 y T3.
+		- conceptos importantes de hoy en dia:
+			- ASnn
+			- AS
+			- BGP
+			- Backbone
+	DNS: Domain Name System
+		- las direcciones IP no son amistosas. Por esa razón se asignan nombres únicos a los host.
+		- DNS proporciona un sistema que a partir de un espacio de nombres jerárquico, convierte nombres en direcciones IP.
+		- El DNS en Internet es un sistema distribuido, jerárquico, replicado y tolerante a fallas.
+		Conceptos y definiciones
+			- Espacio de nombres: conjunto de todos los nombres posibles (Un ejemplo de un espacio de nombres jerárquico es un sistema de archivos).
+			- Enlace (binding): asociación entre nombres y valores.
+			- Mecanismo de resolución: procedimiento que se invoca conun nombre y retorna el valor correspondiente.
+			- Servidor de Nombre: Implantación específica del mecanismo de resolución disponible en una red. Se puede tener acceso vía mensaje.
+		- DNS usa un espacio de nombres jerárquico.
+		- la tabla de enlaces (binding) está particionada en piezas disjuntas y distribuidas en la Internet.
+		- estas subtablas están distribuidas en Servidores de Nombres.
+		- el siguiente diagrama muestra la secuencia de pasos en la conversióon de un nombre en dirección IP.
+		Funcionamiento
+			
+		Ejemplo de Jerarquía de Servidores de Nombres
+		Clases de Servidores de Nombres
+			- Root DNS servers:
+				- hay alrededor de 13 repartidos en distintas partes.
+				- cada server es un cluster de servers replicados.
+			- Top-level domain (TLD) servers:
+				- responsables de ominios como com, edu, gov, uk, cl, etc.
+			- Authoritative DNS servers:
+				- cada organización con host de acceso público sobre Internet.
+			- Local DNS servers
+		Solución Iterativa	
+		Solución Recursiva
+		Implementación de Servidores de Nombres
+			- cada servidor de nombre implementa la información de zona como una colección de registros de recursos.
+			- cada registro de recursos contiene el enlace nombre -> valor.
+			- un registro de recurso es una 5-tupla:
+				- <nombre, valor, Tipo, Clase, TTL>
+			- Tipo: indica como debe ser interpretado el valor (tipo A: el valor es dirección IP).
+			- Clase: otras entidades además del NIC
+			- TTL: tiempo que el registro es  válido.
+		Ejemplo de utilización de DNS
+			- el comando host permite hacer consultas al DNS.
+			- Ej: $host pillanco
+			- $ nslookup
+9- Subredes
+	- la idea original del direccionamiento IP era que la parte de red identificara completamente una red física.
+	- si suponemos una organización con muchas redes que decide conectarse a Internet, cada red debería tener una dirección clase C.
+	- aún más, una red con más de 255 host necesitaría una dirección clase B.
+	- Esto no es posible porque hay menos direcciones clase B que clase C.
+	- Existe gran demanda por clase B, para evitar migrar posteriormente...
+	Ineficiencias del Dirccionamiento
+		- una red con 2 nodos usan una clase C completa.
+			- Se pierden 253 direcciones!
+		- una dirección clase B con un poco más de 255 nodos, pierde alrededor de 64.000 direcciones.
+		- el espacio de direcciones IP es limitado.
+		- es necesario encontrar un método más eficiente para usar números de red.
+		- otro aspecto es el tamaño de las tablas de despacho de los routers IP.
+			- mientras más números estén en uso, mayor es el tamaño de las tablas de despacho lo que genera nuevas deficiencias.
+	Fundamentos
+		- la idea es tomar una dirección IP de Red simple y asignar esta dirección de red a varias redes físicas.
+			- estas redes se denominan subredes. (RFC 950 y RFC 1219)
+		- para que esto sea posible, se requiere:
+			- que las subredes estén físicamente cerca una de otra.
+			- desde distintos puntos de Internet, deben verse como si fuera una sola red, es decir,
+			 un router debe seleccionar sólo una ruta para cualquiera de las subredes.
+			- lo ideal es un campus con muchas redes.
+	Máscaras de Subred
+		- el mecanismo que permite que un número simple de red sea compartido entre múltiples redes,
+		 implica configurar todos los nodos de cada subred con una máscara de subred.
+		- la máscara de subred introduce el llamado número de subred.
+			- todos los host de una misma red física tienen el mismo número de subred,
+			 lo cual significa que todos los host pueden estar en diferentes redes física, pero comparten el mismo número de red.
+	Direccionamiento de Subredes: Ejemplo
+		- Número de red			Número de Host		dirección Clase B
+		- 1111111111111111 11111111	00000000		Mascara 255.255.255.0
+		- Número de Red	  ID subred	ID HOST			dirección subred
+	Jerarquía en el direccionamiento IP
+		- la máscara de subred introduce otro nivel en la jerarquía del direccionamiento IP.
+		- cada host se configura con una dirección de red y una máscara.
+		- cuando un host desea enviar un paquete a alguna dirección IP, lo primero que hace es un AND entre su máscara y la dirección destino IP.
+			- si resulta igual al número de subred del host que envía,
+			 sabe que la dirección destino se encuentra en la misma sub red y el paquete se debe despachar directamente.
+	Ejemplo de Subred
+		- supongamos que H1 envia a H2.
+			- H1 hace un AND de su máscara (255.255.255.128) con la dirección de H2 (128.96.34.139) y obtiene 128.96.34.128.
+			- como no corresponde al número de subred de H1 (128.96.34.0), H1 sabe que H2 está en una subred diferente.
+			- como H1 no puede despachar paquetes en forma directa a H2, lo envía al router por defecto R1.
+	Ejercicio:
+		- IP: 201.35.48.0
+		- armar 2 subredes de 100 PC's c/u.
+		- Respuesta: (usando los RFC antiguos!)
+			- Usamos la máscara: 11000000
+			- Podemos usar:	00, 01, 10, 11 en los bits más significativos.
+				- restricciones: 00, 11
+			- por lo que nos quedan las subredes:
+				- Subred 1: mask= 255.255.255.192	Nred= 201.35.48.64 (ip's 65, 66, 67, ... 127).
+				- Subred 2: mask= 255.255.255.192	Nred= 201.35.48.128 (ip's 129, 130, ..., 254).
+				- no es posible de esta forma armar 2 subredes de 100 PC's! solo nos alcanzan 2^6-2 = 62.
+		- TAREA: estudiar el RFC zero IP (permite usar la máscara 128.
+		- Como NO hay que hacerlo:
+			- es de locos utilizar mascaras no utilizando los bits más significativos.
+	Cambios en el Router
+		- el algoritmo del router cambia al introducir subredes.
+			- Con direccionamiento tradicional, la tabla de despacho es de la forma:
+				- N de red, Salto sigiuente.
+		- al introducir subredes, se agrega una nueva columna a la tabla:
+			- N de Subred, Máscara de Subred, Salto Siguiente.
+		- para encontrar la entrada correcta la tabla, el router hace un AND entre la dirección destino del paquete con la máscara para cada entrada de la tabla.
+	Ejemplo de la Tabla de Despacho
+	Algoritmo de Despacho de Datagramas
+		- D = Dirección IP destino
+		- para cada entrada de la tabla de despacho:
+			{ D1 = Máscara de Subred & D;
+				if (D1 == N de Subred)
+					if (Salto Próximo es una interfaz)
+						Despachar datagrama directamente;
+					else
+						Despachar a Salto Próximo (un router);
+			}
+	Observaciones
+		- es posible poner múltiples subredes sobre una red física simple.
+			- El efecto es forzar a los host de una misma red a comunicarse con los demás a través de un router.
+			- Esto puede tener utilidad para efectos administrativos, como por ejemplo, aislar distintos Deptos. de una empresa que compartan una misma LAN.
+		- desde la lejanía se ve una red simple.
+			- Por ejemplo, 128.96.
+			- Esto significa una sola entrada en sus tablas de despacho.
+				- Internamente es necesario despachar a las subredes correctas.
+17/04/09
+
+5a- Redes LAN Eth y Token
+
+	1- Introducción
+		- En este capítulo, estudiaremos las redes LAN centrándonos en los dos estándares más difundidos: Ethernet y FDDI
+		~ Podemos consisderar a las redes como un éxito de la Ingeniería: se han mantenido practimante durante casi 40 años.
+		- Tanto Ethernet como FDDI son Redes de Enlace Directo. Sus fundamentos están en las ideas expuestas en el capítulo anterior: Redes de enlace directo.
+
+	2- Redes Ethernet: CSMA/CD Ethernet
+		- Es la más existosa LAN. Se desarrolló en los años 70 en los laboratorios XEROX.
+		- Soporta 10 Mbps en su forma estándar
+		- Se ha mantenido durante mucho tiempo
+		~ Ethernet considera una topología de bus, de broadcast, medio compartido.
+		~ Protocolo CSMA/CD 1-persistente
+		~ Cual es el protocolo para poder acceder al medio y poder transmitir? protocolo MAC
+
+		* Segmento Ethernet:
+			- Segmento Ethernet: largo 500m, con un maximo de 50m entre el host y el segmento
+			- Máx estaciones = 100 por segmento y 1024 en total
+			- Entre dos estaciones no pueden haber más de cuatro repetidores.
+				~ Cada repetidor aumenta más la latencia a la red.
+			- Un repetidor es un amplificador de señales digitales.
+			- El largo máximo es de 2500m (4 repetidores)
+			- Ethernet transmite en banda base codificado en Manchester.
+
+			- La tecnología original de 10Mbps usando cables coaxiales de 50 ohm de impedancias se llamaba 10Base 5 (10Mbps, Banda Base, 500m).
+			- Otra tecnología mas barata (coaxial más delgado) se denomina 10Base 2(10Mbps, Banda Base, 200m)
+			- Actualmente la tecnología más utilizada es llamada:
+				10Base T:
+					- 10Mbps
+					- T: Par trenzado (típico categoría 5 UTP)
+					- Limitada a segmentos de 100 metros.
+
+			~ Con 10Base5 se usa conexión con transceiver: una ``aguja'' que se inserta en el transceiver
+			- Con 10Base2 no es posible usar Transceiver por lo delgado del coaxial. Se usa un esquema Daisy Chain con conectores tipo T.
+				~ Muy alto el nivel de fallas en la red.
+
+			~ Esto se solucionó con el uso de HUBs (repetidores de varias vía)
+				- La configuración usual con 10BaseT es tener muchos segmentos punto a punto conectados por un repetidor de varias vías llamado HUB
+				- Todos los Host están en el mismo dominio de colisión.
+					~ Esto es un problema!
+
+			* Formáto de un Frame
+				64b		48b		48b		16b	???	32b	8b
+				Preámbulo	direc. destino	direc. Fuente	Tipo	Cuerpo	CRC	Postámbulo
+						|===========   header 14B   ===========|
+
+				Preámbulo: Secuencia para establecer el sincronismo
+				CRC: Control de Redundancia Crítica
+				Tipo: Es la Demux Key. Sirve para identificar protocolos de alto nivel. En el estándar IEE 802.3 este campo se cambia por el largo.
+					~ En campo Tipo diferencia el protocolo Ethernet y el IEEE 802.3
+				Datos: Hasta 1500 Bytes, el mínimo es 46B. El sentido es mantener un largo suficiente que permita detección de colisión
+				Header: Está formado por las direcciones destino, fuente y el tipo.
+
+				~ Ethernet es un protocolo cerrado de XEROX
+				~ IEEE 802.3 es abierto... pero el que se usa es Ethernet xD
+
+			* Algoritmo de Colisión
+
+				- Si se detecta colisión, se espera 0 o 1 intervalo de tiempo d.
+				- A la segunda colisión, se espera 0,1,2 o 3 intervalos d aleatoriamente
+				- Después de la colisión i, se elige un número entre 0 y 2^i -1
+				- El número máximo de intentos es 16. Después de esto, se reporta al host error de transmisión. 
+				- Esta técnica se conoce como ``backoff exponencial''
+				- En otras palabras, los intervalos de espera son k x d con k=0..2^n -1  y d=51,2 useg
+	3- Redes Token Ring
+	4- Adaptadores de Redes
+15/06/2009
+
+12- Formato y Manejo de Datos
+	1- Introducción.
+	2- Tipos de Datos.
+	3- Compresión de Datos.
+	4- Compresión de Imágenes.
+	5- Seguridad.
+
+1- Introducción
+	-
+	-
+	-
+	-
+	-
+	Formatos de Presentación
+		- desde la perspec
+		-
+		-
+	Formátos Estándares
+		-
+		-
+		-
+		-
+	Transformación de datos
+		- los formatos de presentación involucran la transformación de los datos.
+		- la transformación involucra la codificacion (marshalling) y decodificación (unmarshalling).
+		- ¿Por qué es necesario transformar?
+			- formatos big-endian y little-endiand.
+			- diversos formatos para números flotantes. (ya no es tan así)
+		Ejemplo
+			- big-endian
+			- little-endian
+	Lenguajes y Compiladores
+		- las aplicaciones se escriben en diversos lenguajes de programación.
+		- para un mismo lenguaje existen diversos compiladores.
+		- cada lenguaje usa diversas estrategias.....
+
+2- Tipos de Datos
+	- ¿qué tipos de datos debe soportar un sistema?
+		- tres niveles:
+			- tipos bases: int, float, char (dificultados con bi y little endian).
+			- tipos planos: struct y array (dificultades con rellenos ``padding'').
+			- tipos complejos: punteros (¿cómo transmitir un árbol de búsqueda binaria?).
+	Codificación de Argumentos
+		- estructura de datos de la aplicación.
+		- codificador
+			- conversión.
+			- empaquetamiento.
+			- linealización.
+	Etiquetas (Tags)
+		-
+		-
+	Solución sin Etiquetas (Untagged)
+		- se programa para que el receptor sepa que és cada cosa.
+		- falla al enviar arreglos variables.
+			- En este caso es necesario incorporar una etiqueta que indique el largo del arreglo.
+	Stubs
+		- un stub (colilla) es código que permite empaquetar y desempaquetar argumentos en una forma estándar.
+			- se usan principalmente los protocolos RPC.
+		- los stubs pueden ser compilados o interpretados.
+	XDR (Externarl Data Representation)
+		- XDR es el formato de datos que se utiliza en SunRPC. Soporta tipos de datos de C, pero sin punteros.
+		- de capa 5.
+		- usa etiquetas (tags) sólo para el largo de arreglos y los stubs son compilados.
+		- usa un entero en XDR se representa en complemento 2 con 32 bits en formato big endian.
+			- Al igual que el lenguaje C soporta enteros con y sin signo.
+
+	......... hay mucho detalle, que será mejor que lo veamos por nuestra cuenta.............................
+	......... después de varias diapositivas ................................................................
+		... llego hasta las fotos de leena.......
