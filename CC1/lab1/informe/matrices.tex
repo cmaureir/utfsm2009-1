@@ -1,0 +1,138 @@
+\begin{enumerate}
+	\item Genere una matriz de $7x7$ que contenga sólo números
+	primos ordenados de menor a mayor.\\
+	\textbf{R:}\\
+\begin{center}
+$
+\begin{bmatrix}
+     2 &    3 &    5 &    7 &   11 &   13 &   17\\ 
+    19 &   23 &   29 &   31 &   37 &   41 &   43\\
+    47 &   53 &   59 &   61 &   67 &   71 &   73\\
+    79 &   83 &   89 &   97 &  101 &  103 &  107\\
+   109 &  113 &  127 &  131 &  137 &  139 &  149\\
+   151 &  157 &  163 &  167 &  173 &  179 &  181\\
+   191 &  193 &  197 &  199 &  211 &  223 &  227
+\end{bmatrix}
+$
+\end{center}
+	\item Encuentre los valores propios de la matriz generada,
+	 usando la función provista por el software.\\
+	\textbf{R:}\\
+$
+\lambda_1 = 741.95179 + 0.00000i\\ 
+\lambda_2 = -26.71104 + 0.00000i\\
+\lambda_3 =   5.00551 + 1.16550i\\
+\lambda_4 =   5.00551 - 1.16550i\\
+\lambda_5 =   0.78161 + 0.00000i\\
+\lambda_6 =  -1.01669 + 0.04980i\\
+\lambda_7 =  -1.01669 - 0.04980i\\
+$
+	\item Implemente un algoritmo que encuentre los valores propios
+	de la matriz generada.\\
+	\textbf{R:}\\
+	El algoritmo que utilizamos,
+	está basado en obtener el polinomio característico,
+	y luego obtener las raíces de dicha ecuación.\\
+	\begin{verbatim}
+	octave:1> roots(poly(m))
+	\end{verbatim}
+	Donde $m$, es la matriz con la cual estamos trabajando.\\
+	$poly(m)$ obtiene un vector con los coeficientes del polinomio característico y
+	$roots(m)$ obtiene las raíces de un polinomio determinado.
+	
+	\item Compare los resultados obtenidos de su función contra la
+	función provista por el software.\\
+	\textbf{R:}\\
+	Los resultados para nuestra matriz de $7x7$
+	en ambos casos fueron iguales,
+	ésto es debido a que de las dos formas se utilizan funciones provistas por octave.\\
+
+
+	\item Poniendo a prueba a los algoritmos: compare los tiempos de respuestas de su algoritmo,
+		realice varios experimentos aumentando el tamaño de la matriz progresivamente hasta un
+		tamaño razonable.
+	\begin{enumerate}
+ 		\item ¿Cómo se comporta su algoritmo a medida que el tamaño de la matriz aumenta?\\
+		\textbf{R:}\\
+		Nuestro algoritmo soporto sólo hasta una matriz de $507x507$,
+		ésto se debe a las limitaciones que tiene el comando $roots()$,
+		lo cuál nos llamo mucho la atención ya que como los provee el mismo programa,
+		uno piensa que son 100\% eficientes, pero si nos damos cuenta
+		resolver una ecuación de grado $507$ es todo un reto.
+		\begin{verbatim}
+		roots(poly(rand(507)))
+		\end{verbatim}
+		Para valores aceptados muy grandes,
+		se demora aproximadamente $5$ segundos en poder entregar la solución.
+
+		\item ¿Sucede lo mismo con el algoritmo que utiliza la función del software, por qué?\\
+		\textbf{R:}\\
+		El algoritmo del software $eig()$ se demora mucho menos en poder obtener los
+		valores propios, alrededor de $2$ segundos.
+		Lo cual claramente es un signo de que cuando un algoritmo está enfocado a una tarea
+		en especial, es mucho mas eficiente comparado con la forma $inadecuada$ que pudimos
+		plantear para obtener el resultado.
+
+		\item ¿Qué es un tamaño razonable?
+		\textbf{R:}\\
+		Un tamaño razonable con respecto a éste problema,
+		es un tamaño que transforma la simple tarea de realizar
+		\emph{a mano} algún algoritmo para obtener valores propios,
+		en un ejercicio \emph{inhumano} y casi imposible de realizar.
+
+		Nadie en su sano juicio,
+		sería capaz de realizar el algoritmo con el polinomio característico
+		para obtener valores propios de una matriz de $500x500$
+
+	\end{enumerate}
+	\item Encuentre los vectores linealmente independientes de la matriz generada en $(2.1)$.\\
+	\textbf{R:}\\
+	Como la matriz que formamos está compuesta sólo con números primos,
+	no existe la posibilidad de que existan múltiplos de algunos vectores,
+	y que lleguemos a la conclusión de que dos vectores son \emph{linealmente dependiente}.
+
+	Por lo tanto todos los vectores de la matriz son \emph{linealmente independientes}.
+
+	Una manera de comprobarlo,
+	es operando la matriz hasta poder llegar a su forma irreductible.
+	Ésto es posible mediante la siguiente sentencia de \emph{octave}\\
+	\begin{verbatim}
+	octave:1> ((rref(m')))'
+	\end{verbatim}
+	Lo que quiere decir, que trasponemos la matriz, realizamos operaciones filas,
+	finalmente la trasponemos nuevamente, para dejarla en su estado inicial, y el
+	resultado que nos estrega es la matriz de identidad de dimensiones $7x7$,
+	lo que quiere decir, que llegamos a las bases canónicas, comprobando así
+	que \emph{todos} sus vectores son \emph{linealmente independientes}
+	
+	
+	
+
+	\item ¿Puede dar un ejemplo de una matriz cuyos vectores sean ortogonales pero que no sean
+		linealmente independientes? Demuestre.\\
+		\textbf{R:}\\
+		Supongamos que existe un conjunto ortogonal $ x_1,x_2,\cdots,x_k$ y construyamos una combinación
+		lineal nula de ellos:
+
+		$\displaystyle \alpha_1x_1+\alpha_2x_2+\cdots+\alpha_nx_n=0 $
+
+		Si seleccionamos un vector cualquiera $ x_j$ y efectuamos el producto interno a cada lado
+		de la ecuación tenemos
+
+		$\displaystyle \alpha_1P(x_1,x_j)+\alpha_2P(x_2,x_j)+\cdots+\alpha_nP(x_n,x_j)=0 $
+
+		Como se trata de un sistema ortogonal, el único $ P(x_i,x_j)\neq 0$ es $ P(x_j,x_j)=P_i$, y
+		por lo tanto
+
+		$\displaystyle \alpha_jP(x_j,x_j)=\alpha_jP_i=0 $
+
+		Y por tanto
+
+		$\displaystyle \alpha_j=0 $
+
+		Por lo que podemos concluir que la única combinación lineal nula de los vectores es la
+		que tiene coeficientes nulos, es decir, los vectores son linealmente independientes.
+
+\end{enumerate}
+
+

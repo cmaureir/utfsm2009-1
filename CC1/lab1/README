@@ -1,0 +1,40 @@
+Sobre la ejecución de los scripts:
+=================================
+
+	El laboratorio fue desarrollado con la ayuda de cuatro archivos .m, los cuales contienen los script para octave, que calculan lo solicitado. Cada archivo .m, los cuales van desde 1.m hasta 4.m, corresponden al desarrollo de sus respectivas preguntas.
+
+	Para la ejecucion de los script, solo es necesario entrarlos como argumentos, a traves de la linea de comandos (Linux).
+
+	Ejemplo:
+
+		octave 1.m
+
+Pregunta 1:
+===========
+
+	El script 1.m contiene una funcion vector(), la cual permite generar un vector del tamaño soliticado (11), a base de numeros primos pertenecientes a [1,211]. El resto de comandos son los correspondientes desarrollos de cada item de la pregunta.
+
+Pregunta 2:
+===========
+
+	El script 2.m contiene una funcion matriz(), la cual permite generar una matriz de dimension 7x7 a base de primos, ordenados de menor a mayor, utilizando la funcion primes() que facilita octave.
+	Se determinan los valores propios de dos formar, con el comando eig() y con un algoritmo propio basado en el polinomio característico
+	Se ponen a prueba los algoritmos, con matrices de dimensiones razonables
+	* Se recomienda utilizar matlab para esta seccion, debido a ciertos "bugs" que presenta octave, utilizando matrices muy grandes, con el comando "eig" (Segmentation Fault)
+
+
+Pregunta 3:
+===========
+
+	El script 3.m contiene las siguientes funciones:
+		* R(t): Genera la matriz de transformación en R^2.
+		* R3(t): Genera la matriz de transformación en R^3.
+		* transforma2(v,m): Aplica las transformación 'm' al vector 'v' en R^2. Usa dos for anidados.
+		* transforma3(v,m): Aplica las transformación 'm' al vector 'v' en R^3. Usa dos for anidados.
+	Nota: Para poder graficar los vectores con plot(), se crearon vectores para cada coordenada (x,y,z), en donde el primer componente es el valor del componente respectivo (x,y o z) del vector a graficar, y el segundo componente es el valor del componente respectivo multiplicado por un escalar (en nuestro caso, '5').
+
+Pregunta 4:
+===========
+
+	El script 4.m provee la implementacion de nuestro propio algoritmo SVD, la cual comparamos con la implementacion de svd que provee Octave, a traves de una matriz de (101x101)
+

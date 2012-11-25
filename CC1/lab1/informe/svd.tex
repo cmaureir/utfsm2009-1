@@ -1,0 +1,49 @@
+\begin{enumerate}
+	\item Implemente un algoritmo que calcule la factorización de svd.
+
+	\textbf{R:}\\
+	\begin{verbatim}
+
+	function [U,S,V] = SVD(A)
+		H = A'*A;
+		[V,D] = eig(H);
+		for i = 1:size(V)(1)
+			D2(i,i) = sqrt(abs(D(i,i)));
+		end
+		for i = 1:size(D2)(1)
+			j = size(D2)(1)+1-i;
+			S(j,j) = D2(i,i);
+		end
+		for j = 1:size(V)(1)
+			norma = 0;
+			for i = 1:size(V)(1)
+				norma = V(i,j)*V(i,j) + norma;
+			end
+			norma = sqrt(norma);
+			for i = 1:size(V)(1)
+				V(i,j) = V(i,j)/norma;
+			end
+		end
+		s = size(V)(2);
+		for j = 1:s
+			for i = 1:s
+				tmp(i,j) = V(i, s+1-j);
+			end
+		end
+		V = tmp;
+		U = A*V*inv(S);
+	endfunction
+	\end{verbatim}
+	\newpage
+	\item Compare su implementación con la que provee software como Octave. Para esto genere matrices
+de tamaño superior a $101x101$ de forma aleatoria.
+
+	\textbf{R:}\\
+
+	Claramente la implementación que provee el software Octave, es mucho mas eficiente que el nuestro,
+	especialmente en el tiempo que toma el calculo de la factorización. Además, notamos algunas
+	diferencias (algunos cambios de signo), debido a la implementación de la función eig() que
+	provee Octave, salvo en las matrices $\sum$, que contienen valores singulares idénticos.
+
+\end{enumerate}
+

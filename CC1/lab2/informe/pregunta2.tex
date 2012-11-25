@@ -1,0 +1,60 @@
+\subsection{Sea $A$ $\in$ $\mathbb{R}^{nxn}$ aplique el algoritmo propuesto para $N$ $\in$
+$[1,2,\cdots,N]$ hasta un $n$ razonable, ¿Cómo determino este $n$?}
+
+Primero describiremos el método. Se comienza con una matriz invertible $A$, $n x n$. Se calcula la
+factorización $QR$ de $A$ = $QR$, y a continuación se forma la matriz $A_1 = RQ$. Observaremos que $A$ y
+$A_1$ son semejantes, porque:
+$$
+	Q^{-1} AQ = Q^{-1} (QR) Q = RQ = A_1
+$$
+Por tanto, tienen los mismos valores propios. Continuamos con la factorización $QR$, $R_1Q_1$ de $A_1$, y se forma
+la matriz $A_2 = Q_1 R_1$ que tiene los mismos valores propios que $A$. Iteramos para obtener una sucesión de
+matrices
+$$
+	A, A_1, A_2, A_3, \cdots
+$$
+Resultando que si $A$ tiene $n$ valores propios de distintas magnitudes, entonces basta iterar hasta tal
+$n$ para obtener una matriz triangular superior $\hat{R}$ semejante a $A$. De todas formas, el algoritmo
+no posee un término formal para sus iteraciones. Mientras más se itere, más uno se acercará a la matriz.
+
+\subsection{Examine los valores de $diag(A_N)$, ¿a que corresponden?}
+
+Resulta que si $A$ tiene $n$ valores propios de distintas magnitudes, entonces esta sucesión tiende a una
+matriz triangulas superior $\hat{R}$ semejante a $A$.
+Por consiguiente, los elementos diagonales de $\hat{R}$ son todos los valores propios de $A$.
+El algoritmo y teorema siguiente, cuya demostración omitiremos, es el núcleo del método $QR$ que acabamos
+de describir.
+
+\subsection{El algoritmo planteado es conocido, investigue brevemente al respecto.}
+\textbf{Método $QR$ para valores propios}
+ 
+La descomposición $QR$ puede usarse para aproximar los valores propios de una matriz cuadrada. Al algoritmo
+resultante se le llama método $QR$, y constituye una herramienta importante para aproximaciones numéricas
+de los valores propios. Comparado con los demás, el método $QR$ determina todos los valores propios de una
+matriz. También se usa para resolver sistemas lineales. Además, en la ortonormalización se emplean sus
+variantes para reemplazar el proceso de Gram-Schmidt, que es inestable.
+
+Resulta que si $A$ tiene $n$ valores propios de distintas magnitudes, entonces esta sucesión tiende a una
+matriz triangulas superior $\hat{R}$ semejante a $A$.
+Por consiguiente, los elementos diagonales de $\hat{R}$ son todos los valores propios de $A$.\\
+
+\textbf{El método $QR$:}
+\begin{description}
+	\item[Datos:] Para una matriz $A$ invertible $n x n$, cuyos valores propios son
+	$\lambda_1$,$\cdots$,$\lambda_n$, tal que:
+$$
+		\lvert\lambda_1\rvert>\lvert\lambda_2\rvert>...>\lvert\lambda_n\rvert
+$$
+	\begin{enumerate}	
+		\item Igualar $A_0$ = $A$.
+		\item Para $i = 1,2,\cdots, k-1$:
+		\begin{enumerate}
+			\item Determinar la descomposición $QR$ de $A_i$, por ejemplo $A_i = Q_i R_i$.
+			\item Igualar $A_{i+1} = R_iQ_i$.
+		\end{enumerate}
+	\end{enumerate}
+	\item[Resultados:] $A_k$, que se aproxima a una matriz triangular $\hat{R}$ cuyos elementos diagonales
+	son todos los valores propios de $A$.
+\end{description}
+
+Una nota sobre el método QR, es que en la descomposición QR, la matriz R no es exactamente triangular después del cálculo numérico. Los elementos que deberían ser cero con frecuencia son números muy pequeños. En la práctica, se pasa directamente a las aproximaciones.

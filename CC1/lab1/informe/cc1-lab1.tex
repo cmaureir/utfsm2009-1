@@ -1,0 +1,57 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{}
+\author{}
+
+\parskip 1mm %Espacio entre parrafos
+\setlength{\topmargin}{0pt}
+\oddsidemargin	0.5cm  % Ancho Letter 21,59cm
+\evensidemargin 0.5cm  % Alto  Letter 27,81cm
+\textwidth	15.5cm
+\textheight	21.0cm
+\headsep	4 mm
+\parindent	0.5cm
+
+\pagestyle{fancyplain}
+
+\lhead{Computación Científica 1} %Parte superior izquierda
+\rhead{\bf \it 2009} %Parte superior derecha
+\lfoot{} %Parte inferior izquierda. \thepage indica el numero de pagina
+\cfoot{} %Parte inferior central
+\rfoot{\bf \thepage} %Parte inferior derecha
+\renewcommand{\footrulewidth}{0.4pt} %Linea de separacion inferior
+
+\makeatother
+
+\begin{document}
+
+\include{tapa}
+
+\section{Vectores}
+\input{vectores}
+\newpage
+
+\section{Matrices}
+\input{matrices}
+\newpage
+
+\section{Transformaciones Lineales}
+\input{transformaciones}
+\newpage
+
+\section{SVD}
+\input{svd}
+\newpage
+
+\section{Conclusiones}
+\input{conclusiones}
+\newpage
+
+
+\end{document}
